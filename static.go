@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
@@ -24,7 +25,7 @@ func init() {
 	})
 }
 
-type static struct {
+type Static struct {
 	WidgetBase
 	hwndStatic           win.HWND
 	origStaticWndProcPtr uintptr
@@ -32,7 +33,7 @@ type static struct {
 	textColor            Color
 }
 
-func (s *static) init(widget Widget, parent Container, style uint32) error {
+func (s *Static) init(widget Widget, parent Container, style uint32) error {
 	if err := InitWidget(
 		widget,
 		parent,
@@ -77,7 +78,7 @@ func (s *static) init(widget Widget, parent Container, style uint32) error {
 	return nil
 }
 
-func (s *static) Dispose() {
+func (s *Static) Dispose() {
 	if s.hwndStatic != 0 {
 		win.DestroyWindow(s.hwndStatic)
 		s.hwndStatic = 0
@@ -86,23 +87,23 @@ func (s *static) Dispose() {
 	s.WidgetBase.Dispose()
 }
 
-func (s *static) handleForToolTip() win.HWND {
+func (s *Static) handleForToolTip() win.HWND {
 	return s.hwndStatic
 }
 
-func (s *static) applyEnabled(enabled bool) {
+func (s *Static) applyEnabled(enabled bool) {
 	s.WidgetBase.applyEnabled(enabled)
 
 	setWindowEnabled(s.hwndStatic, enabled)
 }
 
-func (s *static) applyFont(font *Font) {
+func (s *Static) applyFont(font *Font) {
 	s.WidgetBase.applyFont(font)
 
 	SetWindowFont(s.hwndStatic, font)
 }
 
-func (s *static) textAlignment1D() Alignment1D {
+func (s *Static) textAlignment1D() Alignment1D {
 	switch s.textAlignment {
 	case AlignHCenterVNear, AlignHCenterVCenter, AlignHCenterVFar:
 		return AlignCenter
@@ -115,7 +116,7 @@ func (s *static) textAlignment1D() Alignment1D {
 	}
 }
 
-func (s *static) setTextAlignment1D(alignment Alignment1D) error {
+func (s *Static) setTextAlignment1D(alignment Alignment1D) error {
 	var align Alignment2D
 
 	switch alignment {
@@ -132,7 +133,7 @@ func (s *static) setTextAlignment1D(alignment Alignment1D) error {
 	return s.setTextAlignment(align)
 }
 
-func (s *static) setTextAlignment(alignment Alignment2D) error {
+func (s *Static) setTextAlignment(alignment Alignment2D) error {
 	if alignment == s.textAlignment {
 		return nil
 	}
@@ -161,7 +162,7 @@ func (s *static) setTextAlignment(alignment Alignment2D) error {
 	return nil
 }
 
-func (s *static) setText(text string) (changed bool, err error) {
+func (s *Static) setText(text string) (changed bool, err error) {
 	if text == s.text() {
 		return false, nil
 	}
@@ -179,17 +180,17 @@ func (s *static) setText(text string) (changed bool, err error) {
 	return true, nil
 }
 
-func (s *static) TextColor() Color {
+func (s *Static) TextColor() Color {
 	return s.textColor
 }
 
-func (s *static) SetTextColor(c Color) {
+func (s *Static) SetTextColor(c Color) {
 	s.textColor = c
 
 	s.Invalidate()
 }
 
-func (s *static) shrinkable() bool {
+func (s *Static) shrinkable() bool {
 	if em, ok := s.window.(interface{ EllipsisMode() EllipsisMode }); ok {
 		return em.EllipsisMode() != EllipsisNone
 	}
@@ -197,7 +198,7 @@ func (s *static) shrinkable() bool {
 	return false
 }
 
-func (s *static) updateStaticBounds() {
+func (s *Static) updateStaticBounds() {
 	var format DrawTextFormat
 
 	switch s.textAlignment {
@@ -256,7 +257,7 @@ func (s *static) updateStaticBounds() {
 	s.Invalidate()
 }
 
-func (s *static) WndProc(hwnd win.HWND, msg uint32, wp, lp uintptr) uintptr {
+func (s *Static) WndProc(hwnd win.HWND, msg uint32, wp, lp uintptr) uintptr {
 	switch msg {
 	case win.WM_CTLCOLORSTATIC:
 		if hBrush := s.handleWMCTLCOLOR(wp, uintptr(s.hWnd)); hBrush != 0 {
@@ -303,7 +304,7 @@ func staticWndProc(hwnd win.HWND, msg uint32, wp, lp uintptr) uintptr {
 	return win.CallWindowProc(s.origStaticWndProcPtr, hwnd, msg, wp, lp)
 }
 
-func (s *static) CreateLayoutItem(ctx *LayoutContext) LayoutItem {
+func (s *Static) CreateLayoutItem(ctx *LayoutContext) LayoutItem {
 	var layoutFlags LayoutFlags
 	if s.textAlignment1D() != AlignNear {
 		layoutFlags = GrowableHorz
