@@ -12,19 +12,39 @@ import (
 	"github.com/lxn/win"
 )
 
+// 水平和垂直对齐方式
 type Alignment2D uint
 
 const (
-	AlignHVDefault      = Alignment2D(walk.AlignHVDefault)
-	AlignHNearVNear     = Alignment2D(walk.AlignHNearVNear)
-	AlignHCenterVNear   = Alignment2D(walk.AlignHCenterVNear)
-	AlignHFarVNear      = Alignment2D(walk.AlignHFarVNear)
-	AlignHNearVCenter   = Alignment2D(walk.AlignHNearVCenter)
+	// 默认的水平和垂直对齐方式
+	AlignHVDefault = Alignment2D(walk.AlignHVDefault)
+
+	// 水平靠左，垂直靠上对齐
+	AlignHNearVNear = Alignment2D(walk.AlignHNearVNear)
+
+	// 水平居中，垂直靠上对齐
+	AlignHCenterVNear = Alignment2D(walk.AlignHCenterVNear)
+
+	// 水平靠右，垂直靠上对齐
+	AlignHFarVNear = Alignment2D(walk.AlignHFarVNear)
+
+	// 水平靠左，垂直居中对齐
+	AlignHNearVCenter = Alignment2D(walk.AlignHNearVCenter)
+
+	// 水平居中，垂直居中对齐
 	AlignHCenterVCenter = Alignment2D(walk.AlignHCenterVCenter)
-	AlignHFarVCenter    = Alignment2D(walk.AlignHFarVCenter)
-	AlignHNearVFar      = Alignment2D(walk.AlignHNearVFar)
-	AlignHCenterVFar    = Alignment2D(walk.AlignHCenterVFar)
-	AlignHFarVFar       = Alignment2D(walk.AlignHFarVFar)
+
+	// 水平靠右，垂直居中对齐
+	AlignHFarVCenter = Alignment2D(walk.AlignHFarVCenter)
+
+	// 水平靠左，垂直靠下对齐
+	AlignHNearVFar = Alignment2D(walk.AlignHNearVFar)
+
+	// 水平居中，垂直靠下对齐
+	AlignHCenterVFar = Alignment2D(walk.AlignHCenterVFar)
+
+	// 水平靠右，垂直靠下对齐
+	AlignHFarVFar = Alignment2D(walk.AlignHFarVFar)
 )
 
 type TextLabel struct {

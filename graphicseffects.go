@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
@@ -15,6 +16,7 @@ var (
 	FocusEffect       WidgetGraphicsEffect
 )
 
+// 控件的特效
 type WidgetGraphicsEffect interface {
 	Draw(widget Widget, canvas *Canvas) error
 }

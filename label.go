@@ -75,6 +75,7 @@ func (l *Label) TextAlignment() Alignment1D {
 	return l.textAlignment1D()
 }
 
+// 设置文本对齐方式
 func (l *Label) SetTextAlignment(alignment Alignment1D) error {
 	if alignment == AlignDefault {
 		alignment = AlignNear

@@ -15,9 +15,9 @@ import (
 type EllipsisMode int
 
 const (
-	EllipsisNone = EllipsisMode(walk.EllipsisNone)
-	EllipsisEnd  = EllipsisMode(walk.EllipsisEnd)
-	EllipsisPath = EllipsisMode(walk.EllipsisPath)
+	EllipsisNone = EllipsisMode(walk.EllipsisNone) //不使用省略号，文本直接截断
+	EllipsisEnd  = EllipsisMode(walk.EllipsisEnd)  //在文本末尾添加省略号
+	EllipsisPath = EllipsisMode(walk.EllipsisPath) //针对路径字符串的省略，通常会在中间添加省略号
 )
 
 type Label struct {
@@ -47,11 +47,11 @@ type Label struct {
 
 	// Widget
 
-	Alignment          Alignment2D
+	Alignment          Alignment2D //控件水平和垂直对齐方式
 	AlwaysConsumeSpace bool
 	Column             int
 	ColumnSpan         int
-	GraphicsEffects    []walk.WidgetGraphicsEffect
+	GraphicsEffects    []walk.WidgetGraphicsEffect //图形效果
 	Row                int
 	RowSpan            int
 	StretchFactor      int
@@ -59,11 +59,11 @@ type Label struct {
 	// Label
 
 	AssignTo      **walk.Label
-	EllipsisMode  EllipsisMode
+	EllipsisMode  EllipsisMode //文本超出控件宽度时省略显示
 	NoPrefix      bool
 	Text          Property
-	TextAlignment Alignment1D
-	TextColor     walk.Color
+	TextAlignment Alignment1D //文本水平对齐方式
+	TextColor     walk.Color  //文本颜色
 }
 
 func (l Label) Create(builder *Builder) error {

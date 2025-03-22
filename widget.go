@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
@@ -97,7 +98,7 @@ type WidgetBase struct {
 	toolTipTextProperty         Property
 	toolTipTextChangedPublisher EventPublisher
 	graphicsEffects             *WidgetGraphicsEffectList
-	alignment                   Alignment2D
+	alignment                   Alignment2D //文本对齐方式
 	alwaysConsumeSpace          bool
 }
 
