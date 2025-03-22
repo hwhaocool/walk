@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
@@ -11,7 +12,7 @@ import (
 )
 
 type DateLabel struct {
-	static
+	Static
 	date                   time.Time
 	dateChangedPublisher   EventPublisher
 	format                 string
@@ -51,8 +52,8 @@ func NewDateLabel(parent Container) (*DateLabel, error) {
 	return dl, nil
 }
 
-func (dl *DateLabel) asStatic() *static {
-	return &dl.static
+func (dl *DateLabel) AsStatic() *Static {
+	return &dl.Static
 }
 
 func (dl *DateLabel) TextAlignment() Alignment1D {

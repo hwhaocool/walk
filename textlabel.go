@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
@@ -11,7 +12,7 @@ import (
 )
 
 type TextLabel struct {
-	static
+	Static
 	textChangedPublisher EventPublisher
 }
 
@@ -40,8 +41,8 @@ func NewTextLabelWithStyle(parent Container, style uint32) (*TextLabel, error) {
 	return tl, nil
 }
 
-func (tl *TextLabel) asStatic() *static {
-	return &tl.static
+func (tl *TextLabel) AsStatic() *Static {
+	return &tl.Static
 }
 
 func (tl *TextLabel) TextAlignment() Alignment2D {

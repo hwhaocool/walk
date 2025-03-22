@@ -278,12 +278,12 @@ func (s *Static) WndProc(hwnd win.HWND, msg uint32, wp, lp uintptr) uintptr {
 }
 
 func staticWndProc(hwnd win.HWND, msg uint32, wp, lp uintptr) uintptr {
-	as, ok := windowFromHandle(win.GetParent(hwnd)).(interface{ asStatic() *Static })
+	as, ok := windowFromHandle(win.GetParent(hwnd)).(interface{ AsStatic() *Static })
 	if !ok {
 		return 0
 	}
 
-	s := as.asStatic()
+	s := as.AsStatic()
 
 	switch msg {
 	case win.WM_NCHITTEST:

@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
@@ -11,7 +12,7 @@ import (
 )
 
 type NumberLabel struct {
-	static
+	Static
 	decimals                 int
 	decimalsChangedPublisher EventPublisher
 	suffix                   string
@@ -62,8 +63,8 @@ func NewNumberLabel(parent Container) (*NumberLabel, error) {
 	return nl, nil
 }
 
-func (nl *NumberLabel) asStatic() *static {
-	return &nl.static
+func (nl *NumberLabel) AsStatic() *Static {
+	return &nl.Static
 }
 
 func (nl *NumberLabel) TextAlignment() Alignment1D {

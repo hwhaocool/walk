@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
@@ -17,7 +18,7 @@ const (
 )
 
 type Label struct {
-	static
+	Static
 	textChangedPublisher EventPublisher
 }
 
@@ -46,8 +47,8 @@ func NewLabelWithStyle(parent Container, style uint32) (*Label, error) {
 	return l, nil
 }
 
-func (l *Label) asStatic() *static {
-	return &l.static
+func (l *Label) AsStatic() *Static {
+	return &l.Static
 }
 
 func (l *Label) EllipsisMode() EllipsisMode {
