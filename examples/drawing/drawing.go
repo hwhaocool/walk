@@ -7,10 +7,9 @@ package main
 import (
 	"log"
 	"math"
-)
 
-import (
-	"github.com/lxn/walk"
+	"github.com/hwhaocool/walk"
+
 	. "github.com/lxn/walk/declarative"
 )
 

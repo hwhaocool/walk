@@ -9,10 +9,9 @@ import (
 	"os"
 	"path/filepath"
 	"time"
-)
 
-import (
-	"github.com/lxn/walk"
+	"github.com/hwhaocool/walk"
+
 	. "github.com/lxn/walk/declarative"
 )
 

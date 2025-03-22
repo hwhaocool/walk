@@ -6,10 +6,9 @@ package main
 
 import (
 	"bytes"
-)
 
-import (
-	"github.com/lxn/walk"
+	"github.com/hwhaocool/walk"
+
 	. "github.com/lxn/walk/declarative"
 )
 
