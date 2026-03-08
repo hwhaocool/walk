@@ -50,7 +50,7 @@ func (pb *PushButton) SetImageAboveText(value bool) error {
 }
 
 func (pb *PushButton) ensureProperDialogDefaultButton(hwndFocus win.HWND) {
-	widget := windowFromHandle(hwndFocus)
+	widget := WindowFromHandle(hwndFocus)
 	if widget == nil {
 		return
 	}
@@ -74,7 +74,7 @@ func (pb *PushButton) ensureProperDialogDefaultButton(hwndFocus win.HWND) {
 		return
 	}
 
-	if err := defBtn.setAndClearStyleBits(win.BS_DEFPUSHBUTTON, win.BS_PUSHBUTTON); err != nil {
+	if err := defBtn.SetAndClearStyleBits(win.BS_DEFPUSHBUTTON, win.BS_PUSHBUTTON); err != nil {
 		return
 	}
 
@@ -100,7 +100,7 @@ func (pb *PushButton) WndProc(hwnd win.HWND, msg uint32, wParam, lParam uintptr)
 
 			defBtn := dlg.DefaultButton()
 			if defBtn == pb {
-				pb.setAndClearStyleBits(win.BS_DEFPUSHBUTTON, win.BS_PUSHBUTTON)
+				pb.SetAndClearStyleBits(win.BS_DEFPUSHBUTTON, win.BS_PUSHBUTTON)
 				return win.DLGC_BUTTON | win.DLGC_DEFPUSHBUTTON
 			}
 

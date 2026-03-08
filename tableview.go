@@ -561,8 +561,8 @@ func (tv *TableView) ContextMenuLocation() Point {
 
 // SortableByHeaderClick returns if the user can change sorting by clicking the header.
 func (tv *TableView) SortableByHeaderClick() bool {
-	return !hasWindowLongBits(tv.hwndFrozenLV, win.GWL_STYLE, win.LVS_NOSORTHEADER) ||
-		!hasWindowLongBits(tv.hwndNormalLV, win.GWL_STYLE, win.LVS_NOSORTHEADER)
+	return !HasWindowLongBits(tv.hwndFrozenLV, win.GWL_STYLE, win.LVS_NOSORTHEADER) ||
+		!HasWindowLongBits(tv.hwndNormalLV, win.GWL_STYLE, win.LVS_NOSORTHEADER)
 }
 
 // HeaderHidden returns whether the column header is hidden.
@@ -1552,7 +1552,7 @@ func (tv *TableView) StretchLastColumn() error {
 
 		width += lastIndexInLVWidth
 
-		if hasWindowLongBits(tv.hwndNormalLV, win.GWL_STYLE, win.WS_VSCROLL) {
+		if HasWindowLongBits(tv.hwndNormalLV, win.GWL_STYLE, win.WS_VSCROLL) {
 			width -= int(win.GetSystemMetricsForDpi(win.SM_CXVSCROLL, uint32(tv.DPI())))
 		}
 
@@ -1895,7 +1895,7 @@ func (tv *TableView) maybePublishFocusChanged(hwnd win.HWND, msg uint32, wp uint
 }
 
 func tableViewFrozenLVWndProc(hwnd win.HWND, msg uint32, wp, lp uintptr) uintptr {
-	tv := (*TableView)(unsafe.Pointer(windowFromHandle(win.GetParent(hwnd)).AsWindowBase()))
+	tv := (*TableView)(unsafe.Pointer(WindowFromHandle(win.GetParent(hwnd)).AsWindowBase()))
 
 	switch msg {
 	case win.WM_NCCALCSIZE:
@@ -1916,7 +1916,7 @@ func tableViewFrozenLVWndProc(hwnd win.HWND, msg uint32, wp, lp uintptr) uintptr
 }
 
 func tableViewNormalLVWndProc(hwnd win.HWND, msg uint32, wp, lp uintptr) uintptr {
-	tv := (*TableView)(unsafe.Pointer(windowFromHandle(win.GetParent(hwnd)).AsWindowBase()))
+	tv := (*TableView)(unsafe.Pointer(WindowFromHandle(win.GetParent(hwnd)).AsWindowBase()))
 
 	switch msg {
 	case win.WM_LBUTTONDOWN, win.WM_RBUTTONDOWN:
@@ -2048,10 +2048,10 @@ func (tv *TableView) lvWndProc(origWndProcPtr uintptr, hwnd win.HWND, msg uint32
 			tv.toggleItemChecked(tv.currentIndex)
 		}
 
-		tv.handleKeyDown(wp, lp)
+		tv.HandleKeyDown(wp, lp)
 
 	case win.WM_KEYUP:
-		tv.handleKeyUp(wp, lp)
+		tv.HandleKeyUp(wp, lp)
 
 	case win.WM_NOTIFY:
 		nmh := ((*win.NMHDR)(unsafe.Pointer(lp)))
@@ -2488,7 +2488,7 @@ func (tv *TableView) lvWndProc(origWndProcPtr uintptr, hwnd win.HWND, msg uint32
 }
 
 func tableViewHdrWndProc(hwnd win.HWND, msg uint32, wp, lp uintptr) uintptr {
-	tv := (*TableView)(unsafe.Pointer(windowFromHandle(win.GetParent(win.GetParent(hwnd))).AsWindowBase()))
+	tv := (*TableView)(unsafe.Pointer(WindowFromHandle(win.GetParent(win.GetParent(hwnd))).AsWindowBase()))
 
 	var origWndProcPtr uintptr
 	if hwnd == tv.hwndFrozenHdr {
@@ -2715,7 +2715,7 @@ func (tv *TableView) updateLVSizesWithSpecialCare(needSpecialCare bool) {
 	win.MoveWindow(tv.hwndNormalLV, int32(widthPixels), 0, int32(cb.Width-widthPixels), int32(cb.Height), true)
 
 	var sbh int
-	if hasWindowLongBits(tv.hwndNormalLV, win.GWL_STYLE, win.WS_HSCROLL) {
+	if HasWindowLongBits(tv.hwndNormalLV, win.GWL_STYLE, win.WS_HSCROLL) {
 		sbh = int(win.GetSystemMetricsForDpi(win.SM_CYHSCROLL, uint32(dpi)))
 	}
 

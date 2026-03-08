@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
@@ -86,7 +87,7 @@ func (cb *CheckBox) SetTristate(tristate bool) error {
 		set, clear = win.BS_AUTOCHECKBOX, win.BS_AUTO3STATE
 	}
 
-	return cb.setAndClearStyleBits(set, clear)
+	return cb.SetAndClearStyleBits(set, clear)
 }
 
 func (cb *CheckBox) CheckState() CheckState {

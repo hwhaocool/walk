@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
@@ -305,7 +306,7 @@ func applyLayoutResults(results []LayoutResult, stopwatch *stopwatch) error {
 		}
 
 		var maybeInvalidate bool
-		if wnd := windowFromHandle(result.container.Handle()); wnd != nil {
+		if wnd := WindowFromHandle(result.container.Handle()); wnd != nil {
 			if ctr, ok := wnd.(Container); ok {
 				if cb := ctr.AsContainerBase(); cb != nil {
 					maybeInvalidate = cb.hasComplexBackground()
@@ -315,7 +316,7 @@ func applyLayoutResults(results []LayoutResult, stopwatch *stopwatch) error {
 
 		for _, ri := range result.items {
 			if ri.Item.Handle() != 0 {
-				window := windowFromHandle(ri.Item.Handle())
+				window := WindowFromHandle(ri.Item.Handle())
 				if window == nil {
 					continue
 				}
@@ -325,7 +326,7 @@ func applyLayoutResults(results []LayoutResult, stopwatch *stopwatch) error {
 						defer func() {
 							hwndFocused := win.GetFocus()
 							hwndForm := win.GetAncestor(hwndFocused, win.GA_ROOT)
-							activeForm, _ := windowFromHandle(hwndForm).(Form)
+							activeForm, _ := WindowFromHandle(hwndForm).(Form)
 
 							if hwndFocused == 0 || form.Handle() == hwndFocused || activeForm != window.Form() {
 								form.AsFormBase().clientComposite.focusFirstCandidateDescendant()

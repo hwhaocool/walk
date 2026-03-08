@@ -94,7 +94,7 @@ func (s *Static) handleForToolTip() win.HWND {
 func (s *Static) applyEnabled(enabled bool) {
 	s.WidgetBase.applyEnabled(enabled)
 
-	setWindowEnabled(s.hwndStatic, enabled)
+	SetWindowEnabled(s.hwndStatic, enabled)
 }
 
 func (s *Static) applyFont(font *Font) {
@@ -151,7 +151,7 @@ func (s *Static) setTextAlignment(alignment Alignment2D) error {
 		styleBit |= win.SS_RIGHT
 	}
 
-	if err := setAndClearWindowLongBits(s.hwndStatic, win.GWL_STYLE, styleBit, win.SS_LEFT|win.SS_CENTER|win.SS_RIGHT); err != nil {
+	if err := SetAndClearWindowLongBits(s.hwndStatic, win.GWL_STYLE, styleBit, win.SS_LEFT|win.SS_CENTER|win.SS_RIGHT); err != nil {
 		return err
 	}
 
@@ -228,9 +228,9 @@ func (s *Static) updateStaticBounds() {
 	if shrinkable := s.shrinkable(); shrinkable || format&TextVCenter != 0 || format&TextBottom != 0 {
 		var size Size
 		if _, ok := s.window.(HeightForWidther); ok {
-			size = s.calculateTextSizeForWidth(cb.Width)
+			size = s.CalculateTextSizeForWidth(cb.Width)
 		} else {
-			size = s.calculateTextSize()
+			size = s.CalculateTextSize()
 		}
 
 		if shrinkable {
@@ -278,7 +278,7 @@ func (s *Static) WndProc(hwnd win.HWND, msg uint32, wp, lp uintptr) uintptr {
 }
 
 func staticWndProc(hwnd win.HWND, msg uint32, wp, lp uintptr) uintptr {
-	as, ok := windowFromHandle(win.GetParent(hwnd)).(interface{ AsStatic() *Static })
+	as, ok := WindowFromHandle(win.GetParent(hwnd)).(interface{ AsStatic() *Static })
 	if !ok {
 		return 0
 	}
@@ -312,7 +312,7 @@ func (s *Static) CreateLayoutItem(ctx *LayoutContext) LayoutItem {
 		layoutFlags = ShrinkableHorz
 	}
 
-	idealSize := s.calculateTextSize()
+	idealSize := s.CalculateTextSize()
 	if s.hasStyleBits(win.WS_BORDER) {
 		border := s.IntFrom96DPI(1) * 2
 		idealSize.Width += border

@@ -101,18 +101,18 @@ func (dlg *Dialog) SetDefaultButton(button *PushButton) error {
 
 	succeeded := false
 	if dlg.defaultButton != nil {
-		if err := dlg.defaultButton.setAndClearStyleBits(win.BS_PUSHBUTTON, win.BS_DEFPUSHBUTTON); err != nil {
+		if err := dlg.defaultButton.SetAndClearStyleBits(win.BS_PUSHBUTTON, win.BS_DEFPUSHBUTTON); err != nil {
 			return err
 		}
 		defer func() {
 			if !succeeded {
-				dlg.defaultButton.setAndClearStyleBits(win.BS_DEFPUSHBUTTON, win.BS_PUSHBUTTON)
+				dlg.defaultButton.SetAndClearStyleBits(win.BS_DEFPUSHBUTTON, win.BS_PUSHBUTTON)
 			}
 		}()
 	}
 
 	if button != nil {
-		if err := button.setAndClearStyleBits(win.BS_DEFPUSHBUTTON, win.BS_PUSHBUTTON); err != nil {
+		if err := button.SetAndClearStyleBits(win.BS_DEFPUSHBUTTON, win.BS_PUSHBUTTON); err != nil {
 			return err
 		}
 	}

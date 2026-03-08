@@ -403,7 +403,7 @@ func (fb *FormBase) handleKeyDown(msg *win.MSG) bool {
 
 	LOOP:
 		for hwnd != 0 {
-			window := windowFromHandle(hwnd)
+			window := WindowFromHandle(hwnd)
 
 			switch widget := window.(type) {
 			case nil:
@@ -437,7 +437,7 @@ func (fb *FormBase) handleKeyDown(msg *win.MSG) bool {
 	// Shortcut actions
 	hwnd := msg.HWnd
 	for hwnd != 0 {
-		if window := windowFromHandle(hwnd); window != nil {
+		if window := WindowFromHandle(hwnd); window != nil {
 			wb := window.AsWindowBase()
 
 			if wb.shortcutActions != nil {

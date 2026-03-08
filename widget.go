@@ -384,7 +384,7 @@ func (wb *WidgetBase) ForEachAncestor(f func(window Window) bool) {
 	hwnd := win.GetParent(wb.HWnd)
 
 	for hwnd != 0 {
-		if window := windowFromHandle(hwnd); window != nil {
+		if window := WindowFromHandle(hwnd); window != nil {
 			if !f(window) {
 				return
 			}
@@ -506,7 +506,7 @@ func ancestor(w Widget) Form {
 
 	hWndRoot := win.GetAncestor(w.Handle(), win.GA_ROOT)
 
-	rw, _ := windowFromHandle(hWndRoot).(Form)
+	rw, _ := WindowFromHandle(hWndRoot).(Form)
 	return rw
 }
 

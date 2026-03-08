@@ -173,7 +173,7 @@ func (le *LineEdit) SetTextAlignment(alignment Alignment1D) error {
 		bit = win.ES_LEFT
 	}
 
-	return le.setAndClearStyleBits(bit, win.ES_LEFT|win.ES_CENTER|win.ES_RIGHT)
+	return le.SetAndClearStyleBits(bit, win.ES_LEFT|win.ES_CENTER|win.ES_RIGHT)
 }
 
 func (le *LineEdit) CaseMode() CaseMode {
@@ -207,7 +207,7 @@ func (le *LineEdit) SetCaseMode(mode CaseMode) error {
 		panic("invalid CaseMode")
 	}
 
-	return le.setAndClearStyleBits(set, clear)
+	return le.SetAndClearStyleBits(set, clear)
 }
 
 func (le *LineEdit) PasswordMode() bool {

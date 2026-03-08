@@ -243,12 +243,12 @@ func (cb *ContainerBase) doPaint() error {
 	if FocusEffect != nil {
 		hwndFocused := win.GetFocus()
 		var widget Widget
-		if wnd := windowFromHandle(hwndFocused); wnd != nil {
+		if wnd := WindowFromHandle(hwndFocused); wnd != nil {
 			widget, _ = wnd.(Widget)
 		}
 		for hwndFocused != 0 && (widget == nil || widget.Parent() == nil) {
 			hwndFocused = win.GetParent(hwndFocused)
-			if wnd := windowFromHandle(hwndFocused); wnd != nil {
+			if wnd := WindowFromHandle(hwndFocused); wnd != nil {
 				widget, _ = wnd.(Widget)
 			}
 		}
@@ -338,7 +338,7 @@ func (cb *ContainerBase) WndProc(hwnd win.HWND, msg uint32, wParam, lParam uintp
 				hwndSrc = win.HWND(lParam)
 			}
 
-			if window := windowFromHandle(hwndSrc); window != nil {
+			if window := WindowFromHandle(hwndSrc); window != nil {
 				if _, ok := window.(*ToolBar); toolBarOnly && !ok {
 					break
 				}
@@ -350,27 +350,27 @@ func (cb *ContainerBase) WndProc(hwnd win.HWND, msg uint32, wParam, lParam uintp
 
 	case win.WM_MEASUREITEM:
 		mis := (*win.MEASUREITEMSTRUCT)(unsafe.Pointer(lParam))
-		if window := windowFromHandle(win.GetDlgItem(hwnd, int32(mis.CtlID))); window != nil {
+		if window := WindowFromHandle(win.GetDlgItem(hwnd, int32(mis.CtlID))); window != nil {
 			// The window that sent the notification shall handle it itself.
 			return window.WndProc(hwnd, msg, wParam, lParam)
 		}
 
 	case win.WM_DRAWITEM:
 		dis := (*win.DRAWITEMSTRUCT)(unsafe.Pointer(lParam))
-		if window := windowFromHandle(dis.HwndItem); window != nil {
+		if window := WindowFromHandle(dis.HwndItem); window != nil {
 			// The window that sent the notification shall handle it itself.
 			return window.WndProc(hwnd, msg, wParam, lParam)
 		}
 
 	case win.WM_NOTIFY:
 		nmh := (*win.NMHDR)(unsafe.Pointer(lParam))
-		if window := windowFromHandle(nmh.HwndFrom); window != nil {
+		if window := WindowFromHandle(nmh.HwndFrom); window != nil {
 			// The window that sent the notification shall handle it itself.
 			return window.WndProc(hwnd, msg, wParam, lParam)
 		}
 
 	case win.WM_HSCROLL, win.WM_VSCROLL:
-		if window := windowFromHandle(win.HWND(lParam)); window != nil {
+		if window := WindowFromHandle(win.HWND(lParam)); window != nil {
 			// The window that sent the notification shall handle it itself.
 			return window.WndProc(hwnd, msg, wParam, lParam)
 		}
@@ -473,7 +473,7 @@ func firstFocusableDescendantCallback(hwnd win.HWND, lParam uintptr) uintptr {
 	}
 
 	if win.GetWindowLong(hwnd, win.GWL_STYLE)&win.WS_TABSTOP > 0 {
-		if rb, ok := windowFromHandle(hwnd).(radioButtonish); ok {
+		if rb, ok := WindowFromHandle(hwnd).(radioButtonish); ok {
 			if !rb.radioButton().Checked() {
 				return 1
 			}
@@ -500,11 +500,11 @@ func firstFocusableDescendant(container Container) Window {
 
 	win.EnumChildWindows(container.Handle(), firstFocusableDescendantCallbackPtr, uintptr(unsafe.Pointer(&hwnd)))
 
-	window := windowFromHandle(hwnd)
+	window := WindowFromHandle(hwnd)
 
 	for hwnd != 0 && window == nil {
 		hwnd = win.GetParent(hwnd)
-		window = windowFromHandle(hwnd)
+		window = WindowFromHandle(hwnd)
 	}
 
 	return window

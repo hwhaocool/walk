@@ -520,7 +520,7 @@ func newNumberLineEdit(parent Widget) (*numberLineEdit, error) {
 		}
 	}()
 
-	if err := nle.LineEdit.setAndClearStyleBits(win.ES_RIGHT, win.ES_LEFT|win.ES_CENTER); err != nil {
+	if err := nle.LineEdit.SetAndClearStyleBits(win.ES_RIGHT, win.ES_LEFT|win.ES_CENTER); err != nil {
 		return nil, err
 	}
 
@@ -967,8 +967,8 @@ func (nle *numberLineEdit) WndProc(hwnd win.HWND, msg uint32, wParam, lParam uin
 }
 
 func (nle *numberLineEdit) onFocusChanged() {
-	if ne := windowFromHandle(win.GetParent(nle.HWnd)); ne != nil {
-		if wnd := windowFromHandle(win.GetParent(ne.Handle())); wnd != nil {
+	if ne := WindowFromHandle(win.GetParent(nle.HWnd)); ne != nil {
+		if wnd := WindowFromHandle(win.GetParent(ne.Handle())); wnd != nil {
 			if _, ok := wnd.(Container); ok {
 				ne.(Widget).AsWidgetBase().invalidateBorderInParent()
 			}

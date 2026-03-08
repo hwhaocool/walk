@@ -555,7 +555,7 @@ func initWindowWithCfg(cfg *windowCfg) error {
 		initCtrls.DwICC = win.ICC_LINK_CLASS | win.ICC_LISTVIEW_CLASSES | win.ICC_PROGRESS_CLASS | win.ICC_TAB_CLASSES | win.ICC_TREEVIEW_CLASSES
 		win.InitCommonControlsEx(&initCtrls)
 
-		defaultWndProcPtr = syscall.NewCallback(defaultWndProc)
+		defaultWndProcPtr = syscall.NewCallback(DefaultWndProc)
 		for _, fn := range walkInit {
 			fn()
 		}
@@ -750,28 +750,28 @@ func (wb *WindowBase) Property(name string) Property {
 }
 
 func (wb *WindowBase) hasStyleBits(bits uint32) bool {
-	return hasWindowLongBits(wb.HWnd, win.GWL_STYLE, bits)
+	return HasWindowLongBits(wb.HWnd, win.GWL_STYLE, bits)
 }
 
 func (wb *WindowBase) hasExtendedStyleBits(bits uint32) bool {
-	return hasWindowLongBits(wb.HWnd, win.GWL_EXSTYLE, bits)
+	return HasWindowLongBits(wb.HWnd, win.GWL_EXSTYLE, bits)
 }
 
-func hasWindowLongBits(hwnd win.HWND, index int32, bits uint32) bool {
+func HasWindowLongBits(hwnd win.HWND, index int32, bits uint32) bool {
 	value := uint32(win.GetWindowLong(hwnd, index))
 
 	return value&bits == bits
 }
 
-func (wb *WindowBase) setAndClearStyleBits(set, clear uint32) error {
-	return setAndClearWindowLongBits(wb.HWnd, win.GWL_STYLE, set, clear)
+func (wb *WindowBase) SetAndClearStyleBits(set, clear uint32) error {
+	return SetAndClearWindowLongBits(wb.HWnd, win.GWL_STYLE, set, clear)
 }
 
 func (wb *WindowBase) setAndClearExtendedStyleBits(set, clear uint32) error {
-	return setAndClearWindowLongBits(wb.HWnd, win.GWL_EXSTYLE, set, clear)
+	return SetAndClearWindowLongBits(wb.HWnd, win.GWL_EXSTYLE, set, clear)
 }
 
-func setAndClearWindowLongBits(hwnd win.HWND, index int32, set, clear uint32) error {
+func SetAndClearWindowLongBits(hwnd win.HWND, index int32, set, clear uint32) error {
 	value := uint32(win.GetWindowLong(hwnd, index))
 	if value == 0 {
 		return lastError("GetWindowLong")
@@ -803,7 +803,7 @@ func ensureWindowLongBits(hwnd win.HWND, index int32, bits uint32, set bool) err
 	} else {
 		clearBits = bits
 	}
-	return setAndClearWindowLongBits(hwnd, index, setBits, clearBits)
+	return SetAndClearWindowLongBits(hwnd, index, setBits, clearBits)
 }
 
 // Accessibility returns the accessibility object used to set Dynamic Annotation properties of the
@@ -837,7 +837,7 @@ func (wb *WindowBase) SetName(name string) {
 
 func (wb *WindowBase) writePath(buf *bytes.Buffer) {
 	hWndParent := win.GetAncestor(wb.HWnd, win.GA_PARENT)
-	if pwi := windowFromHandle(hWndParent); pwi != nil {
+	if pwi := WindowFromHandle(hWndParent); pwi != nil {
 		if sv, ok := pwi.(*ScrollView); ok {
 			pwi = sv.Parent()
 		}
@@ -1106,10 +1106,10 @@ type applyEnableder interface {
 }
 
 func (wb *WindowBase) applyEnabled(enabled bool) {
-	setWindowEnabled(wb.HWnd, enabled)
+	SetWindowEnabled(wb.HWnd, enabled)
 }
 
-func setWindowEnabled(hwnd win.HWND, enabled bool) {
+func SetWindowEnabled(hwnd win.HWND, enabled bool) {
 	win.EnableWindow(hwnd, enabled)
 
 	win.UpdateWindow(hwnd)
@@ -1163,7 +1163,7 @@ func SetWindowFont(hwnd win.HWND, font *Font) {
 func setWindowFont(hwnd win.HWND, hFont win.HFONT) {
 	win.SendMessage(hwnd, win.WM_SETFONT, uintptr(hFont), 1)
 
-	if window := windowFromHandle(hwnd); window != nil {
+	if window := WindowFromHandle(hwnd); window != nil {
 		if widget, ok := window.(Widget); ok {
 			widget.AsWidgetBase().RequestLayout()
 		}
@@ -1301,7 +1301,7 @@ func (wb *WindowBase) Form() Form {
 }
 
 func forEachDescendant(hwnd win.HWND, lParam uintptr) uintptr {
-	if window := windowFromHandle(hwnd); window == nil || forEachDescendantCallback(window.(Widget)) {
+	if window := WindowFromHandle(hwnd); window == nil || forEachDescendantCallback(window.(Widget)) {
 		return 1
 	}
 
@@ -1617,13 +1617,13 @@ func (wb *WindowBase) calculateTextSizeImplForWidth(text string, width int) Size
 	return size
 }
 
-// calculateTextSize calculates text size in native pixels.
-func (wb *WindowBase) calculateTextSize() Size {
-	return wb.calculateTextSizeForWidth(0)
+// CalculateTextSize calculates text size in native pixels.
+func (wb *WindowBase) CalculateTextSize() Size {
+	return wb.CalculateTextSizeForWidth(0)
 }
 
-// calculateTextSizeForWidth calculates text size for specified width in native pixels.
-func (wb *WindowBase) calculateTextSizeForWidth(width int) Size {
+// CalculateTextSizeForWidth calculates text size for specified width in native pixels.
+func (wb *WindowBase) CalculateTextSizeForWidth(width int) Size {
 	return wb.calculateTextSizeImplForWidth(wb.text(), width)
 }
 
@@ -1916,7 +1916,7 @@ func (wb *WindowBase) RequestLayout() {
 		}
 
 		hwnd = win.GetParent(hwnd)
-		window = windowFromHandle(hwnd)
+		window = WindowFromHandle(hwnd)
 	}
 
 	if form == nil {
@@ -1955,7 +1955,7 @@ func (wb *WindowBase) Screenshot() (*image.RGBA, error) {
 
 // FocusedWindow returns the Window that has the keyboard input focus.
 func FocusedWindow() Window {
-	return windowFromHandle(win.GetFocus())
+	return WindowFromHandle(win.GetFocus())
 }
 
 // Focused returns whether the Window has the keyboard input focus.
@@ -2129,7 +2129,7 @@ func (wb *WindowBase) WriteState(state string) error {
 	return settings.PutExpiring(p, state)
 }
 
-func windowFromHandle(hwnd win.HWND) Window {
+func WindowFromHandle(hwnd win.HWND) Window {
 	if wb := hwnd2WindowBase[hwnd]; wb != nil {
 		return wb.window
 	}
@@ -2137,7 +2137,7 @@ func windowFromHandle(hwnd win.HWND) Window {
 	return nil
 }
 
-func defaultWndProc(hwnd win.HWND, msg uint32, wParam, lParam uintptr) (result uintptr) {
+func DefaultWndProc(hwnd win.HWND, msg uint32, wParam, lParam uintptr) (result uintptr) {
 	defer func() {
 		// FIXME: Rework the panicking publisher so that we don't have to
 		// access a private member here.
@@ -2160,7 +2160,7 @@ func defaultWndProc(hwnd win.HWND, msg uint32, wParam, lParam uintptr) (result u
 		return notifyIconWndProc(hwnd, msg, wParam, lParam)
 	}
 
-	wi := windowFromHandle(hwnd)
+	wi := WindowFromHandle(hwnd)
 	if wi == nil {
 		return win.DefWindowProc(hwnd, msg, wParam, lParam)
 	}
@@ -2174,13 +2174,13 @@ type menuer interface {
 	Menu() *Menu
 }
 
-func menuContainsAction(menu *Menu, action *Action) bool {
+func MenuContainsAction(menu *Menu, action *Action) bool {
 	if menu.Actions().Contains(action) {
 		return true
 	}
 
 	for _, a := range menu.actions.actions {
-		if a.menu != nil && menuContainsAction(a.menu, action) {
+		if a.menu != nil && MenuContainsAction(a.menu, action) {
 			return true
 		}
 	}
@@ -2188,7 +2188,7 @@ func menuContainsAction(menu *Menu, action *Action) bool {
 	return false
 }
 
-func (wb *WindowBase) handleKeyDown(wParam, lParam uintptr) {
+func (wb *WindowBase) HandleKeyDown(wParam, lParam uintptr) {
 	key := Key(wParam)
 
 	if uint32(lParam)>>30 == 0 {
@@ -2205,7 +2205,7 @@ func (wb *WindowBase) handleKeyDown(wParam, lParam uintptr) {
 					window = ancestor(w)
 				}
 
-				if m, ok := window.(menuer); ok && menuContainsAction(m.Menu(), action) {
+				if m, ok := window.(menuer); ok && MenuContainsAction(m.Menu(), action) {
 					action.raiseTriggered()
 				}
 			}
@@ -2221,18 +2221,18 @@ func (wb *WindowBase) handleKeyDown(wParam, lParam uintptr) {
 	}
 }
 
-func (wb *WindowBase) handleKeyUp(wParam, lParam uintptr) {
+func (wb *WindowBase) HandleKeyUp(wParam, lParam uintptr) {
 	wb.keyUpPublisher.Publish(Key(wParam))
 }
 
-func (wb *WindowBase) backgroundEffective() (Brush, Window) {
+func (wb *WindowBase) BackgroundEffective() (Brush, Window) {
 	wnd := wb.window
 	bg := wnd.Background()
 
 	if widget, ok := wb.window.(Widget); ok {
 		for bg == nullBrushSingleton && widget != nil {
 			if hwndParent := win.GetParent(widget.Handle()); hwndParent != 0 {
-				if parent := windowFromHandle(hwndParent); parent != nil {
+				if parent := WindowFromHandle(hwndParent); parent != nil {
 					wnd = parent
 					bg = parent.Background()
 
@@ -2255,7 +2255,7 @@ func (wb *WindowBase) backgroundEffective() (Brush, Window) {
 	return bg, wnd
 }
 
-func (wb *WindowBase) prepareDCForBackground(hdc win.HDC, hwnd win.HWND, brushWnd Window) {
+func (wb *WindowBase) PrepareDCForBackground(hdc win.HDC, hwnd win.HWND, brushWnd Window) {
 	if _, ok := brushWnd.(Container); ok {
 		win.SetBkMode(hdc, win.TRANSPARENT)
 	}
@@ -2277,9 +2277,9 @@ func (wb *WindowBase) HandleWMCTLCOLOR(wParam, lParam uintptr) uintptr {
 		TextColor() Color
 	}
 
-	wnd := windowFromHandle(hwnd)
+	wnd := WindowFromHandle(hwnd)
 	if wnd == nil {
-		switch windowFromHandle(win.GetParent(hwnd)).(type) {
+		switch WindowFromHandle(win.GetParent(hwnd)).(type) {
 		case *ComboBox:
 			// nop
 			return 0
@@ -2294,8 +2294,8 @@ func (wb *WindowBase) HandleWMCTLCOLOR(wParam, lParam uintptr) uintptr {
 		win.SetTextColor(hdc, win.COLORREF(color))
 	}
 
-	if bg, wnd := wnd.AsWindowBase().backgroundEffective(); bg != nil {
-		wb.prepareDCForBackground(hdc, hwnd, wnd)
+	if bg, wnd := wnd.AsWindowBase().BackgroundEffective(); bg != nil {
+		wb.PrepareDCForBackground(hdc, hwnd, wnd)
 
 		type Colorer interface {
 			Color() Color
@@ -2334,7 +2334,7 @@ func (wb *WindowBase) HandleWMCTLCOLOR(wParam, lParam uintptr) uintptr {
 // When implementing your own WndProc to add or modify behavior, call the
 // WndProc of the embedded window for messages you don't handle yourself.
 func (wb *WindowBase) WndProc(hwnd win.HWND, msg uint32, wParam, lParam uintptr) uintptr {
-	window := windowFromHandle(hwnd)
+	window := WindowFromHandle(hwnd)
 
 	switch msg {
 	case win.WM_ERASEBKGND:
@@ -2342,7 +2342,7 @@ func (wb *WindowBase) WndProc(hwnd win.HWND, msg uint32, wParam, lParam uintptr)
 			return 0
 		}
 
-		bg, wnd := wb.backgroundEffective()
+		bg, wnd := wb.BackgroundEffective()
 		if bg == nil {
 			break
 		}
@@ -2355,7 +2355,7 @@ func (wb *WindowBase) WndProc(hwnd win.HWND, msg uint32, wParam, lParam uintptr)
 		}
 		defer canvas.Dispose()
 
-		wb.prepareDCForBackground(hdc, hwnd, wnd)
+		wb.PrepareDCForBackground(hdc, hwnd, wnd)
 
 		if err := canvas.FillRectanglePixels(bg, wb.ClientBoundsPixels()); err != nil {
 			break
@@ -2364,7 +2364,7 @@ func (wb *WindowBase) WndProc(hwnd win.HWND, msg uint32, wParam, lParam uintptr)
 		return 1
 
 	case win.WM_HSCROLL, win.WM_VSCROLL:
-		if window := windowFromHandle(win.HWND(lParam)); window != nil {
+		if window := WindowFromHandle(win.HWND(lParam)); window != nil {
 			// The window that sent the notification shall handle it itself.
 			return window.WndProc(hwnd, msg, wParam, lParam)
 		}
@@ -2404,7 +2404,7 @@ func (wb *WindowBase) WndProc(hwnd win.HWND, msg uint32, wParam, lParam uintptr)
 				hwndParent := win.GetParent(wnd.Handle())
 				for parent == nil && hwndParent != 0 {
 					hwndParent = win.GetParent(hwndParent)
-					if wnd := windowFromHandle(hwndParent); wnd != nil {
+					if wnd := WindowFromHandle(hwndParent); wnd != nil {
 						parent, _ = wnd.(Container)
 					}
 				}
@@ -2424,7 +2424,7 @@ func (wb *WindowBase) WndProc(hwnd win.HWND, msg uint32, wParam, lParam uintptr)
 		}
 
 	case win.WM_CONTEXTMENU:
-		sourceWindow := windowFromHandle(win.HWND(wParam))
+		sourceWindow := WindowFromHandle(win.HWND(wParam))
 		if sourceWindow == nil {
 			break
 		}
@@ -2464,10 +2464,10 @@ func (wb *WindowBase) WndProc(hwnd win.HWND, msg uint32, wParam, lParam uintptr)
 		}
 
 	case win.WM_KEYDOWN:
-		wb.handleKeyDown(wParam, lParam)
+		wb.HandleKeyDown(wParam, lParam)
 
 	case win.WM_KEYUP:
-		wb.handleKeyUp(wParam, lParam)
+		wb.HandleKeyUp(wParam, lParam)
 
 	case win.WM_DROPFILES:
 		wb.dropFilesPublisher.Publish(win.HDROP(wParam))

@@ -164,7 +164,7 @@ func (gb *GroupBox) applyEnabled(enabled bool) {
 	gb.WidgetBase.applyEnabled(enabled)
 
 	if gb.hWndGroupBox != 0 {
-		setWindowEnabled(gb.hWndGroupBox, enabled)
+		SetWindowEnabled(gb.hWndGroupBox, enabled)
 	}
 
 	if gb.checkBox != nil {
@@ -178,7 +178,7 @@ func (gb *GroupBox) applyEnabled(enabled bool) {
 
 func (gb *GroupBox) applyEnabledFromCheckBox(enabled bool) {
 	if gb.hWndGroupBox != 0 {
-		setWindowEnabled(gb.hWndGroupBox, enabled)
+		SetWindowEnabled(gb.hWndGroupBox, enabled)
 	}
 
 	if gb.composite != nil {
@@ -320,7 +320,7 @@ func (gb *GroupBox) WndProc(hwnd win.HWND, msg uint32, wParam, lParam uintptr) u
 		case win.WM_COMMAND:
 			hwndSrc := win.GetDlgItem(gb.HWnd, int32(win.LOWORD(uint32(wParam))))
 
-			if window := windowFromHandle(hwndSrc); window != nil {
+			if window := WindowFromHandle(hwndSrc); window != nil {
 				window.WndProc(hwnd, msg, wParam, lParam)
 			}
 

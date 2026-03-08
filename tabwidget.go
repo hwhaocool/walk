@@ -106,7 +106,7 @@ func (tw *TabWidget) Dispose() {
 func (tw *TabWidget) applyEnabled(enabled bool) {
 	tw.WidgetBase.applyEnabled(enabled)
 
-	setWindowEnabled(tw.hWndTab, enabled)
+	SetWindowEnabled(tw.hWndTab, enabled)
 
 	applyEnabledToDescendants(tw, enabled)
 }
@@ -392,8 +392,8 @@ func tabWidgetTabWndProc(hwnd win.HWND, msg uint32, wParam, lParam uintptr) uint
 		}
 
 		// Draw background of free area not occupied by tab items.
-		if bg, wnd := parent.AsWindowBase().backgroundEffective(); bg != nil {
-			tw.prepareDCForBackground(canvas.hdc, hwnd, wnd)
+		if bg, wnd := parent.AsWindowBase().BackgroundEffective(); bg != nil {
+			tw.PrepareDCForBackground(canvas.hdc, hwnd, wnd)
 
 			hRgn := win.CreateRectRgn(0, 0, 0, 0)
 			defer win.DeleteObject(win.HGDIOBJ(hRgn))
@@ -435,11 +435,11 @@ func tabWidgetTabWndProc(hwnd win.HWND, msg uint32, wParam, lParam uintptr) uint
 		if tw.currentIndex != -1 {
 			page := tw.pages.At(tw.CurrentIndex())
 
-			if bg, wnd := page.AsWindowBase().backgroundEffective(); bg != nil &&
+			if bg, wnd := page.AsWindowBase().BackgroundEffective(); bg != nil &&
 				bg != tabPageBackgroundBrush &&
 				(page.layout == nil || !page.layout.Margins().isZero()) {
 
-				tw.prepareDCForBackground(canvas.hdc, hwnd, wnd)
+				tw.PrepareDCForBackground(canvas.hdc, hwnd, wnd)
 
 				var rc win.RECT
 				if 0 == win.SendMessage(hwnd, win.TCM_GETITEMRECT, uintptr(tw.currentIndex), uintptr(unsafe.Pointer(&rc))) {

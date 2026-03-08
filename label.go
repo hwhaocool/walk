@@ -62,7 +62,7 @@ func (l *Label) SetEllipsisMode(mode EllipsisMode) error {
 		return nil
 	}
 
-	if err := setAndClearWindowLongBits(l.hwndStatic, win.GWL_STYLE, uint32(mode), uint32(oldMode)); err != nil {
+	if err := SetAndClearWindowLongBits(l.hwndStatic, win.GWL_STYLE, uint32(mode), uint32(oldMode)); err != nil {
 		return err
 	}
 

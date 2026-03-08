@@ -208,7 +208,7 @@ func (te *TextEdit) SetTextAlignment(alignment Alignment1D) error {
 		bit = win.ES_LEFT
 	}
 
-	return te.setAndClearStyleBits(bit, win.ES_LEFT|win.ES_CENTER|win.ES_RIGHT)
+	return te.SetAndClearStyleBits(bit, win.ES_LEFT|win.ES_CENTER|win.ES_RIGHT)
 }
 
 func (te *TextEdit) MaxLength() int {
