@@ -171,7 +171,7 @@ func (s *Static) setText(text string) (changed bool, err error) {
 		return false, err
 	}
 
-	if err := setWindowText(s.hwndStatic, text); err != nil {
+	if err := SetWindowText(s.hwndStatic, text); err != nil {
 		return false, err
 	}
 

@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
@@ -1220,7 +1221,7 @@ func (wb *WindowBase) text() string {
 }
 
 func (wb *WindowBase) setText(text string) error {
-	if err := setWindowText(wb.hWnd, text); err != nil {
+	if err := SetWindowText(wb.hWnd, text); err != nil {
 		return err
 	}
 
@@ -1234,7 +1235,7 @@ func windowText(hwnd win.HWND) string {
 	return syscall.UTF16ToString(buf)
 }
 
-func setWindowText(hwnd win.HWND, text string) error {
+func SetWindowText(hwnd win.HWND, text string) error {
 	if win.TRUE != win.SendMessage(hwnd, win.WM_SETTEXT, 0, uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(text)))) {
 		return newError("WM_SETTEXT failed")
 	}
