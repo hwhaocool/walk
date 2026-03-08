@@ -407,7 +407,7 @@ type WindowBase struct {
 	group                     *WindowGroup
 	window                    Window
 	form                      Form
-	hWnd                      win.HWND
+	HWnd                      win.HWND
 	origWndProcPtr            uintptr
 	name                      string
 	font                      *Font
@@ -602,7 +602,7 @@ func initWindowWithCfg(cfg *windowCfg) error {
 			h = int32(cfg.Bounds.Height)
 		}
 
-		wb.hWnd = win.CreateWindowEx(
+		wb.HWnd = win.CreateWindowEx(
 			cfg.ExStyle,
 			syscall.StringToUTF16Ptr(cfg.ClassName),
 			windowName,
@@ -615,11 +615,11 @@ func initWindowWithCfg(cfg *windowCfg) error {
 			hMenu,
 			0,
 			nil)
-		if wb.hWnd == 0 {
+		if wb.HWnd == 0 {
 			return lastError("CreateWindowEx")
 		}
 	} else {
-		wb.hWnd = hwnd
+		wb.HWnd = hwnd
 	}
 
 	// Handles returned by CreateWindowEx can only be used by the calling
@@ -646,17 +646,17 @@ func initWindowWithCfg(cfg *windowCfg) error {
 		}
 	}()
 
-	hwnd2WindowBase[wb.hWnd] = wb
+	hwnd2WindowBase[wb.HWnd] = wb
 
 	if !registeredWindowClasses[cfg.ClassName] {
 		// We subclass all windows of system classes.
-		wb.origWndProcPtr = win.SetWindowLongPtr(wb.hWnd, win.GWLP_WNDPROC, defaultWndProcPtr)
+		wb.origWndProcPtr = win.SetWindowLongPtr(wb.HWnd, win.GWLP_WNDPROC, defaultWndProcPtr)
 		if wb.origWndProcPtr == 0 {
 			return lastError("SetWindowLongPtr")
 		}
 	}
 
-	SetWindowFont(wb.hWnd, defaultFont)
+	SetWindowFont(wb.HWnd, defaultFont)
 
 	if form, ok := cfg.Window.(Form); ok {
 		if fb := form.AsFormBase(); fb != nil {
@@ -750,11 +750,11 @@ func (wb *WindowBase) Property(name string) Property {
 }
 
 func (wb *WindowBase) hasStyleBits(bits uint32) bool {
-	return hasWindowLongBits(wb.hWnd, win.GWL_STYLE, bits)
+	return hasWindowLongBits(wb.HWnd, win.GWL_STYLE, bits)
 }
 
 func (wb *WindowBase) hasExtendedStyleBits(bits uint32) bool {
-	return hasWindowLongBits(wb.hWnd, win.GWL_EXSTYLE, bits)
+	return hasWindowLongBits(wb.HWnd, win.GWL_EXSTYLE, bits)
 }
 
 func hasWindowLongBits(hwnd win.HWND, index int32, bits uint32) bool {
@@ -764,11 +764,11 @@ func hasWindowLongBits(hwnd win.HWND, index int32, bits uint32) bool {
 }
 
 func (wb *WindowBase) setAndClearStyleBits(set, clear uint32) error {
-	return setAndClearWindowLongBits(wb.hWnd, win.GWL_STYLE, set, clear)
+	return setAndClearWindowLongBits(wb.HWnd, win.GWL_STYLE, set, clear)
 }
 
 func (wb *WindowBase) setAndClearExtendedStyleBits(set, clear uint32) error {
-	return setAndClearWindowLongBits(wb.hWnd, win.GWL_EXSTYLE, set, clear)
+	return setAndClearWindowLongBits(wb.HWnd, win.GWL_EXSTYLE, set, clear)
 }
 
 func setAndClearWindowLongBits(hwnd win.HWND, index int32, set, clear uint32) error {
@@ -788,11 +788,11 @@ func setAndClearWindowLongBits(hwnd win.HWND, index int32, set, clear uint32) er
 }
 
 func (wb *WindowBase) ensureStyleBits(bits uint32, set bool) error {
-	return ensureWindowLongBits(wb.hWnd, win.GWL_STYLE, bits, set)
+	return ensureWindowLongBits(wb.HWnd, win.GWL_STYLE, bits, set)
 }
 
 func (wb *WindowBase) ensureExtendedStyleBits(bits uint32, set bool) error {
-	return ensureWindowLongBits(wb.hWnd, win.GWL_EXSTYLE, bits, set)
+	return ensureWindowLongBits(wb.HWnd, win.GWL_EXSTYLE, bits, set)
 }
 
 func ensureWindowLongBits(hwnd win.HWND, index int32, bits uint32, set bool) error {
@@ -817,12 +817,12 @@ func (wb *WindowBase) Accessibility() *Accessibility {
 
 // Handle returns the window handle of the Window.
 func (wb *WindowBase) Handle() win.HWND {
-	return wb.hWnd
+	return wb.HWnd
 }
 
 // SendMessage sends a message to the window and returns the result.
 func (wb *WindowBase) SendMessage(msg uint32, wParam, lParam uintptr) uintptr {
-	return win.SendMessage(wb.hWnd, msg, wParam, lParam)
+	return win.SendMessage(wb.HWnd, msg, wParam, lParam)
 }
 
 // Name returns the name of the *WindowBase.
@@ -836,7 +836,7 @@ func (wb *WindowBase) SetName(name string) {
 }
 
 func (wb *WindowBase) writePath(buf *bytes.Buffer) {
-	hWndParent := win.GetAncestor(wb.hWnd, win.GA_PARENT)
+	hWndParent := win.GetAncestor(wb.HWnd, win.GA_PARENT)
 	if pwi := windowFromHandle(hWndParent); pwi != nil {
 		if sv, ok := pwi.(*ScrollView); ok {
 			pwi = sv.Parent()
@@ -882,11 +882,11 @@ func (wb *WindowBase) Dispose() {
 		wb.background.detachWindow(wb)
 	}
 
-	hWnd := wb.hWnd
+	hWnd := wb.HWnd
 	if hWnd != 0 {
 		wb.disposingPublisher.Publish()
 
-		wb.hWnd = 0
+		wb.HWnd = 0
 		if _, ok := hwnd2WindowBase[hWnd]; ok {
 			win.DestroyWindow(hWnd)
 		}
@@ -906,7 +906,7 @@ func (wb *WindowBase) Dispose() {
 	}
 
 	if hWnd != 0 {
-		wb.group.accClearHwndProps(wb.hWnd)
+		wb.group.accClearHwndProps(wb.HWnd)
 		wb.group.Done()
 	}
 }
@@ -919,7 +919,7 @@ func (wb *WindowBase) Disposing() *Event {
 
 // IsDisposed returns if the *WindowBase has been disposed of.
 func (wb *WindowBase) IsDisposed() bool {
-	return wb.hWnd == 0
+	return wb.HWnd == 0
 }
 
 // ContextMenu returns the context menu of the *WindowBase.
@@ -937,7 +937,7 @@ func (wb *WindowBase) SetContextMenu(value *Menu) {
 // ContextMenuLocation returns the the *WindowBase center in screen coordinates in native pixels.
 func (wb *WindowBase) ContextMenuLocation() Point {
 	var rc win.RECT
-	if !win.GetWindowRect(wb.hWnd, &rc) {
+	if !win.GetWindowRect(wb.HWnd, &rc) {
 		return Point{}
 	}
 	return Point{int(rc.Left+rc.Right) / 2, int(rc.Top+rc.Bottom) / 2}
@@ -1020,7 +1020,7 @@ func (wb *WindowBase) ApplySysColors() {
 
 // DPI returns the current DPI value of the WindowBase.
 func (wb *WindowBase) DPI() int {
-	return int(win.GetDpiForWindow(wb.hWnd))
+	return int(win.GetDpiForWindow(wb.HWnd))
 }
 
 type ApplyDPIer interface {
@@ -1106,7 +1106,7 @@ type applyEnableder interface {
 }
 
 func (wb *WindowBase) applyEnabled(enabled bool) {
-	setWindowEnabled(wb.hWnd, enabled)
+	setWindowEnabled(wb.HWnd, enabled)
 }
 
 func setWindowEnabled(hwnd win.HWND, enabled bool) {
@@ -1147,7 +1147,7 @@ func (wb *WindowBase) applyFont(font *Font) {
 	if hFont := font.handleForDPI(wb.DPI()); hFont != wb.hFont {
 		wb.hFont = hFont
 
-		setWindowFont(wb.hWnd, hFont)
+		setWindowFont(wb.HWnd, hFont)
 	}
 
 	if af, ok := wb.window.(ApplyFonter); ok {
@@ -1209,7 +1209,7 @@ func (wb *WindowBase) SetSuspended(suspend bool) {
 
 // Invalidate schedules a full repaint of the *WindowBase.
 func (wb *WindowBase) Invalidate() error {
-	if !win.InvalidateRect(wb.hWnd, nil, true) {
+	if !win.InvalidateRect(wb.HWnd, nil, true) {
 		return newError("InvalidateRect failed")
 	}
 
@@ -1217,11 +1217,19 @@ func (wb *WindowBase) Invalidate() error {
 }
 
 func (wb *WindowBase) text() string {
-	return windowText(wb.hWnd)
+	return windowText(wb.HWnd)
 }
 
 func (wb *WindowBase) setText(text string) error {
-	if err := SetWindowText(wb.hWnd, text); err != nil {
+	if err := SetWindowText(wb.HWnd, text); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (wb *WindowBase) SetText2(text string) error {
+	if err := SetWindowText(wb.HWnd, text); err != nil {
 		return err
 	}
 
@@ -1311,7 +1319,7 @@ func (wb *WindowBase) ForEachDescendant(f func(widget Widget) bool) {
 		forEachDescendantCallback = nil
 	}()
 
-	win.EnumChildWindows(wb.hWnd, forEachDescendantCallbackPtr, 0)
+	win.EnumChildWindows(wb.HWnd, forEachDescendantCallbackPtr, 0)
 }
 
 func forEachDescendantRaw(hwnd win.HWND, lParam uintptr) uintptr {
@@ -1333,19 +1341,19 @@ func (wb *WindowBase) forEachDescendantRaw(lParam uintptr, f func(hwnd win.HWND,
 		forEachDescendantRawCallback = nil
 	}()
 
-	win.EnumChildWindows(wb.hWnd, forEachDescendantRawCallbackPtr, lParam)
+	win.EnumChildWindows(wb.HWnd, forEachDescendantRawCallbackPtr, lParam)
 }
 
 // Visible returns if the *WindowBase is visible.
 func (wb *WindowBase) Visible() bool {
-	return win.IsWindowVisible(wb.hWnd)
+	return win.IsWindowVisible(wb.HWnd)
 }
 
 // SetVisible sets if the *WindowBase is visible.
 func (wb *WindowBase) SetVisible(visible bool) {
 	old := wb.Visible()
 
-	setWindowVisible(wb.hWnd, visible)
+	setWindowVisible(wb.HWnd, visible)
 
 	wb.visible = visible
 
@@ -1386,7 +1394,7 @@ func setWindowVisible(hwnd win.HWND, visible bool) {
 
 // BringToTop moves the *WindowBase to the top of the keyboard focus order.
 func (wb *WindowBase) BringToTop() error {
-	if !win.SetWindowPos(wb.hWnd, win.HWND_TOP, 0, 0, 0, 0, win.SWP_NOACTIVATE|win.SWP_NOMOVE|win.SWP_NOSIZE) {
+	if !win.SetWindowPos(wb.HWnd, win.HWND_TOP, 0, 0, 0, 0, win.SWP_NOACTIVATE|win.SWP_NOMOVE|win.SWP_NOSIZE) {
 		return lastError("SetWindowPos")
 	}
 
@@ -1417,7 +1425,7 @@ func (wb *WindowBase) SetBounds(bounds Rectangle) error {
 func (wb *WindowBase) BoundsPixels() Rectangle {
 	var r win.RECT
 
-	if !win.GetWindowRect(wb.hWnd, &r) {
+	if !win.GetWindowRect(wb.HWnd, &r) {
 		lastError("GetWindowRect")
 		return Rectangle{}
 	}
@@ -1432,7 +1440,7 @@ func (wb *WindowBase) BoundsPixels() Rectangle {
 // coordinates, for a child Window the coordinates are relative to its parent.
 func (wb *WindowBase) SetBoundsPixels(bounds Rectangle) error {
 	if !win.MoveWindow(
-		wb.hWnd,
+		wb.HWnd,
 		int32(bounds.X),
 		int32(bounds.Y),
 		int32(bounds.Width),
@@ -1533,8 +1541,8 @@ func (wb *WindowBase) dialogBaseUnits() Size {
 		return s
 	}
 
-	hdc := win.GetDC(wb.hWnd)
-	defer win.ReleaseDC(wb.hWnd, hdc)
+	hdc := win.GetDC(wb.HWnd)
+	defer win.ReleaseDC(wb.HWnd, hdc)
 
 	hFont := font.handleForDPI(wb.DPI())
 	hFontOld := win.SelectObject(hdc, win.HGDIOBJ(hFont))
@@ -1602,7 +1610,7 @@ func (wb *WindowBase) calculateTextSizeImplForWidth(text string, width int) Size
 		return size
 	}
 
-	size := calculateTextSize(text, font, dpi, width, wb.hWnd)
+	size := calculateTextSize(text, font, dpi, width, wb.HWnd)
 
 	wb.calcTextSizeInfo2TextSize[key] = size
 
@@ -1838,7 +1846,7 @@ func (wb *WindowBase) ClientBounds() Rectangle {
 // ClientBoundsPixels returns the inner bounding box rectangle of the *WindowBase,
 // excluding decorations.
 func (wb *WindowBase) ClientBoundsPixels() Rectangle {
-	return windowClientBounds(wb.hWnd)
+	return windowClientBounds(wb.HWnd)
 }
 
 // sizeFromClientSizePixels calculates size from client size in native pixels.
@@ -1877,7 +1885,7 @@ func (wb *WindowBase) SetClientSizePixels(value Size) error {
 func (wb *WindowBase) RequestLayout() {
 	var form Form
 
-	hwnd := wb.hWnd
+	hwnd := wb.HWnd
 	window := wb.window
 
 	for hwnd != 0 {
@@ -1952,12 +1960,12 @@ func FocusedWindow() Window {
 
 // Focused returns whether the Window has the keyboard input focus.
 func (wb *WindowBase) Focused() bool {
-	return wb.hWnd == win.GetFocus()
+	return wb.HWnd == win.GetFocus()
 }
 
 // SetFocus sets the keyboard input focus to the *WindowBase.
 func (wb *WindowBase) SetFocus() error {
-	if win.SetFocus(wb.hWnd) == 0 {
+	if win.SetFocus(wb.HWnd) == 0 {
 		return lastError("SetFocus")
 	}
 
@@ -1980,7 +1988,7 @@ func (wb *WindowBase) CreateCanvas() (*Canvas, error) {
 }
 
 func (wb *WindowBase) setTheme(appName string) error {
-	if hr := win.SetWindowTheme(wb.hWnd, syscall.StringToUTF16Ptr(appName), nil); win.FAILED(hr) {
+	if hr := win.SetWindowTheme(wb.HWnd, syscall.StringToUTF16Ptr(appName), nil); win.FAILED(hr) {
 		return errorFromHRESULT("SetWindowTheme", hr)
 	}
 
@@ -2008,7 +2016,7 @@ func (wb *WindowBase) KeyUp() *KeyEvent {
 // DropFiles returns a *DropFilesEvent that you can attach to for handling
 // drop file events for the *WindowBase.
 func (wb *WindowBase) DropFiles() *DropFilesEvent {
-	return wb.dropFilesPublisher.Event(wb.hWnd)
+	return wb.dropFilesPublisher.Event(wb.HWnd)
 }
 
 // MouseDown returns a *MouseEvent that you can attach to for handling
@@ -2080,7 +2088,7 @@ func (wb *WindowBase) BoundsChanged() *Event {
 func (wb *WindowBase) Synchronize(f func()) {
 	wb.group.Synchronize(f)
 
-	win.PostMessage(wb.hWnd, syncMsgId, 0, 0)
+	win.PostMessage(wb.HWnd, syncMsgId, 0, 0)
 }
 
 // synchronizeLayout causes the given layout computations to be applied
@@ -2091,7 +2099,7 @@ func (wb *WindowBase) Synchronize(f func()) {
 func (wb *WindowBase) synchronizeLayout(result *formLayoutResult) {
 	wb.group.synchronizeLayout(result)
 
-	win.PostMessage(wb.hWnd, syncMsgId, 0, 0)
+	win.PostMessage(wb.HWnd, syncMsgId, 0, 0)
 }
 
 func (wb *WindowBase) ReadState() (string, error) {
@@ -2366,7 +2374,7 @@ func (wb *WindowBase) WndProc(hwnd win.HWND, msg uint32, wParam, lParam uintptr)
 			// Only call SetCapture if this is no subclassed control.
 			// (Otherwise e.g. WM_COMMAND(BN_CLICKED) would no longer
 			// be generated for PushButton.)
-			win.SetCapture(wb.hWnd)
+			win.SetCapture(wb.HWnd)
 		}
 		wb.publishMouseEvent(&wb.mouseDownPublisher, msg, wParam, lParam)
 
@@ -2498,13 +2506,13 @@ func (wb *WindowBase) WndProc(hwnd win.HWND, msg uint32, wParam, lParam uintptr)
 			// clean-up code in the WM_NCDESTROY handlers of some windows from
 			// being called. To fix this, we restore the original window
 			// procedure here.
-			win.SetWindowLongPtr(wb.hWnd, win.GWLP_WNDPROC, wb.origWndProcPtr)
+			win.SetWindowLongPtr(wb.HWnd, win.GWLP_WNDPROC, wb.origWndProcPtr)
 		}
 
 		delete(hwnd2WindowBase, hwnd)
 
 		wb.window.Dispose()
-		wb.hWnd = 0
+		wb.HWnd = 0
 	}
 
 	if window != nil {

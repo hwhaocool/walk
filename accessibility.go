@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
@@ -127,56 +128,56 @@ type Accessibility struct {
 
 // SetAccelerator sets window accelerator name using Dynamic Annotation.
 func (a *Accessibility) SetAccelerator(acc string) error {
-	return a.accSetPropertyStr(a.wb.hWnd, &win.PROPID_ACC_KEYBOARDSHORTCUT, win.EVENT_OBJECT_ACCELERATORCHANGE, acc)
+	return a.accSetPropertyStr(a.wb.HWnd, &win.PROPID_ACC_KEYBOARDSHORTCUT, win.EVENT_OBJECT_ACCELERATORCHANGE, acc)
 }
 
 // SetDefaultAction sets window default action using Dynamic Annotation.
 func (a *Accessibility) SetDefaultAction(defAction string) error {
-	return a.accSetPropertyStr(a.wb.hWnd, &win.PROPID_ACC_DEFAULTACTION, win.EVENT_OBJECT_DEFACTIONCHANGE, defAction)
+	return a.accSetPropertyStr(a.wb.HWnd, &win.PROPID_ACC_DEFAULTACTION, win.EVENT_OBJECT_DEFACTIONCHANGE, defAction)
 }
 
 // SetDescription sets window description using Dynamic Annotation.
 func (a *Accessibility) SetDescription(acc string) error {
-	return a.accSetPropertyStr(a.wb.hWnd, &win.PROPID_ACC_DESCRIPTION, win.EVENT_OBJECT_DESCRIPTIONCHANGE, acc)
+	return a.accSetPropertyStr(a.wb.HWnd, &win.PROPID_ACC_DESCRIPTION, win.EVENT_OBJECT_DESCRIPTIONCHANGE, acc)
 }
 
 // SetHelp sets window help using Dynamic Annotation.
 func (a *Accessibility) SetHelp(help string) error {
-	return a.accSetPropertyStr(a.wb.hWnd, &win.PROPID_ACC_HELP, win.EVENT_OBJECT_HELPCHANGE, help)
+	return a.accSetPropertyStr(a.wb.HWnd, &win.PROPID_ACC_HELP, win.EVENT_OBJECT_HELPCHANGE, help)
 }
 
 // SetName sets window name using Dynamic Annotation.
 func (a *Accessibility) SetName(name string) error {
-	return a.accSetPropertyStr(a.wb.hWnd, &win.PROPID_ACC_NAME, win.EVENT_OBJECT_NAMECHANGE, name)
+	return a.accSetPropertyStr(a.wb.HWnd, &win.PROPID_ACC_NAME, win.EVENT_OBJECT_NAMECHANGE, name)
 }
 
 // SetRole sets window role using Dynamic Annotation. The role must be set when the window is
 // created and is not to be modified later.
 func (a *Accessibility) SetRole(role AccRole) error {
-	return a.accSetPropertyInt(a.wb.hWnd, &win.PROPID_ACC_ROLE, 0, int32(role))
+	return a.accSetPropertyInt(a.wb.HWnd, &win.PROPID_ACC_ROLE, 0, int32(role))
 }
 
 // SetRoleMap sets window role map using Dynamic Annotation. The role map must be set when the
 // window is created and is not to be modified later.
 func (a *Accessibility) SetRoleMap(roleMap string) error {
-	return a.accSetPropertyStr(a.wb.hWnd, &win.PROPID_ACC_ROLEMAP, 0, roleMap)
+	return a.accSetPropertyStr(a.wb.HWnd, &win.PROPID_ACC_ROLEMAP, 0, roleMap)
 }
 
 // SetState sets window state using Dynamic Annotation.
 func (a *Accessibility) SetState(state AccState) error {
-	return a.accSetPropertyInt(a.wb.hWnd, &win.PROPID_ACC_STATE, win.EVENT_OBJECT_STATECHANGE, int32(state))
+	return a.accSetPropertyInt(a.wb.HWnd, &win.PROPID_ACC_STATE, win.EVENT_OBJECT_STATECHANGE, int32(state))
 }
 
 // SetStateMap sets window state map using Dynamic Annotation. The state map must be set when
 // the window is created and is not to be modified later.
 func (a *Accessibility) SetStateMap(stateMap string) error {
-	return a.accSetPropertyStr(a.wb.hWnd, &win.PROPID_ACC_STATEMAP, 0, stateMap)
+	return a.accSetPropertyStr(a.wb.HWnd, &win.PROPID_ACC_STATEMAP, 0, stateMap)
 }
 
 // SetValueMap sets window value map using Dynamic Annotation. The value map must be set when
 // the window is created and is not to be modified later.
 func (a *Accessibility) SetValueMap(valueMap string) error {
-	return a.accSetPropertyStr(a.wb.hWnd, &win.PROPID_ACC_VALUEMAP, 0, valueMap)
+	return a.accSetPropertyStr(a.wb.HWnd, &win.PROPID_ACC_VALUEMAP, 0, valueMap)
 }
 
 // accSetPropertyInt sets integer window property for Dynamic Annotation.

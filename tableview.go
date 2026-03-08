@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
@@ -186,7 +187,7 @@ func NewTableViewWithCfg(parent Container, cfg *TableViewCfg) (*TableView, error
 		win.CW_USEDEFAULT,
 		win.CW_USEDEFAULT,
 		win.CW_USEDEFAULT,
-		tv.hWnd,
+		tv.HWnd,
 		0,
 		0,
 		nil,
@@ -214,7 +215,7 @@ func NewTableViewWithCfg(parent Container, cfg *TableViewCfg) (*TableView, error
 		win.CW_USEDEFAULT,
 		win.CW_USEDEFAULT,
 		win.CW_USEDEFAULT,
-		tv.hWnd,
+		tv.HWnd,
 		0,
 		0,
 		nil,
@@ -340,11 +341,11 @@ func (tv *TableView) Dispose() {
 
 	tv.disposeImageListAndCaches()
 
-	if tv.hWnd != 0 {
-		if !win.KillTimer(tv.hWnd, tableViewCurrentIndexChangedTimerId) {
+	if tv.HWnd != 0 {
+		if !win.KillTimer(tv.HWnd, tableViewCurrentIndexChangedTimerId) {
 			lastError("KillTimer")
 		}
-		if !win.KillTimer(tv.hWnd, tableViewSelectedIndexesChangedTimerId) {
+		if !win.KillTimer(tv.HWnd, tableViewSelectedIndexesChangedTimerId) {
 			lastError("KillTimer")
 		}
 	}
@@ -701,7 +702,7 @@ func (tv *TableView) attachModel() {
 			defer tv.currentItemChangedPublisher.Publish()
 		} else {
 			if 0 == win.SetTimer(
-				tv.hWnd,
+				tv.HWnd,
 				tableViewCurrentIndexChangedTimerId,
 				uint32(tv.itemStateChangedEventDelay),
 				0,
@@ -1471,7 +1472,7 @@ func (tv *TableView) SelectedIndexesChanged() *Event {
 func (tv *TableView) publishSelectedIndexesChanged() {
 	if tv.itemStateChangedEventDelay > 0 {
 		if 0 == win.SetTimer(
-			tv.hWnd,
+			tv.HWnd,
 			tableViewSelectedIndexesChangedTimerId,
 			uint32(tv.itemStateChangedEventDelay),
 			0) {
@@ -1927,7 +1928,7 @@ func tableViewNormalLVWndProc(hwnd win.HWND, msg uint32, wp, lp uintptr) uintptr
 
 	case win.WM_KILLFOCUS:
 		win.SendMessage(tv.hwndFrozenLV, msg, wp, lp)
-		tv.WndProc(tv.hWnd, msg, wp, lp)
+		tv.WndProc(tv.HWnd, msg, wp, lp)
 		tv.maybePublishFocusChanged(hwnd, msg, wp)
 	}
 
@@ -2373,7 +2374,7 @@ func (tv *TableView) lvWndProc(origWndProcPtr uintptr, hwnd win.HWND, msg uint32
 				if tv.itemStateChangedEventDelay > 0 {
 					tv.delayedCurrentIndexChangedCanceled = false
 					if 0 == win.SetTimer(
-						tv.hWnd,
+						tv.HWnd,
 						tableViewCurrentIndexChangedTimerId,
 						uint32(tv.itemStateChangedEventDelay),
 						0) {
@@ -2638,16 +2639,16 @@ func (tv *TableView) WndProc(hwnd win.HWND, msg uint32, wp, lp uintptr) uintptr 
 
 		vsbWidth := win.GetSystemMetricsForDpi(win.SM_CXVSCROLL, dpi)
 		rc = win.RECT{wp.Cx - vsbWidth - 1, 0, wp.Cx, wp.Cy}
-		win.InvalidateRect(tv.hWnd, &rc, true)
+		win.InvalidateRect(tv.HWnd, &rc, true)
 
 		hsbHeight := win.GetSystemMetricsForDpi(win.SM_CYHSCROLL, dpi)
 		rc = win.RECT{0, wp.Cy - hsbHeight - 1, wp.Cx, wp.Cy}
-		win.InvalidateRect(tv.hWnd, &rc, true)
+		win.InvalidateRect(tv.HWnd, &rc, true)
 
 		tv.redrawItems()
 
 	case win.WM_TIMER:
-		if !win.KillTimer(tv.hWnd, wp) {
+		if !win.KillTimer(tv.HWnd, wp) {
 			lastError("KillTimer")
 		}
 

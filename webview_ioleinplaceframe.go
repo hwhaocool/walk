@@ -2,15 +2,14 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
 
 import (
 	"syscall"
-)
 
-import (
 	"github.com/lxn/win"
 )
 
@@ -56,7 +55,7 @@ func webView_IOleInPlaceFrame_Release(inPlaceFrame *webViewIOleInPlaceFrame) uin
 }
 
 func webView_IOleInPlaceFrame_GetWindow(inPlaceFrame *webViewIOleInPlaceFrame, lphwnd *win.HWND) uintptr {
-	*lphwnd = inPlaceFrame.webView.hWnd
+	*lphwnd = inPlaceFrame.webView.HWnd
 
 	return win.S_OK
 }

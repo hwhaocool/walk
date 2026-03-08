@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows && !walk_use_cgo
 // +build windows,!walk_use_cgo
 
 package walk
@@ -16,7 +17,7 @@ func (fb *FormBase) mainLoop() int {
 	msg := (*win.MSG)(unsafe.Pointer(win.GlobalAlloc(0, unsafe.Sizeof(win.MSG{}))))
 	defer win.GlobalFree(win.HGLOBAL(unsafe.Pointer(msg)))
 
-	for fb.hWnd != 0 {
+	for fb.HWnd != 0 {
 		switch win.GetMessage(msg, 0, 0, 0) {
 		case 0:
 			return int(msg.WParam)
@@ -32,7 +33,7 @@ func (fb *FormBase) mainLoop() int {
 			}
 		}
 
-		if !win.IsDialogMessage(fb.hWnd, msg) {
+		if !win.IsDialogMessage(fb.HWnd, msg) {
 			win.TranslateMessage(msg)
 			win.DispatchMessage(msg)
 		}

@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
@@ -28,7 +29,7 @@ func NewToolTip() (*ToolTip, error) {
 		return nil, err
 	}
 
-	win.SetWindowPos(tt.hWnd, win.HWND_TOPMOST, 0, 0, 0, 0, win.SWP_NOMOVE|win.SWP_NOSIZE|win.SWP_NOACTIVATE)
+	win.SetWindowPos(tt.HWnd, win.HWND_TOPMOST, 0, 0, 0, 0, win.SWP_NOMOVE|win.SWP_NOSIZE|win.SWP_NOACTIVATE)
 
 	return tt, nil
 }
@@ -140,7 +141,7 @@ func (tt *ToolTip) track(tool Widget) error {
 	} else {
 		insertAfterHWND = tool.Handle()
 	}
-	win.SetWindowPos(tt.hWnd, insertAfterHWND, 0, 0, 0, 0, win.SWP_NOMOVE|win.SWP_NOSIZE|win.SWP_NOACTIVATE)
+	win.SetWindowPos(tt.HWnd, insertAfterHWND, 0, 0, 0, 0, win.SWP_NOMOVE|win.SWP_NOSIZE|win.SWP_NOACTIVATE)
 
 	return nil
 }

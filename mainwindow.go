@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
@@ -69,7 +70,7 @@ func NewMainWindowWithCfg(cfg *MainWindowCfg) (*MainWindow, error) {
 	if mw.menu, err = newMenuBar(mw); err != nil {
 		return nil, err
 	}
-	if !win.SetMenu(mw.hWnd, mw.menu.hMenu) {
+	if !win.SetMenu(mw.HWnd, mw.menu.hMenu) {
 		return nil, lastError("SetMenu")
 	}
 
@@ -85,7 +86,7 @@ func NewMainWindowWithCfg(cfg *MainWindowCfg) (*MainWindow, error) {
 	mw.statusBar.parent = nil
 	mw.Children().Remove(mw.statusBar)
 	mw.statusBar.parent = mw
-	win.SetParent(mw.statusBar.hWnd, mw.hWnd)
+	win.SetParent(mw.statusBar.HWnd, mw.HWnd)
 	mw.statusBar.visibleChangedPublisher.event.Attach(func() {
 		mw.SetBoundsPixels(mw.BoundsPixels())
 	})
@@ -105,7 +106,7 @@ func (mw *MainWindow) ToolBar() *ToolBar {
 
 func (mw *MainWindow) SetToolBar(tb *ToolBar) {
 	if mw.toolBar != nil {
-		win.SetParent(mw.toolBar.hWnd, 0)
+		win.SetParent(mw.toolBar.HWnd, 0)
 	}
 
 	if tb != nil {
@@ -113,7 +114,7 @@ func (mw *MainWindow) SetToolBar(tb *ToolBar) {
 		tb.parent = nil
 		parent.Children().Remove(tb)
 		tb.parent = mw
-		win.SetParent(tb.hWnd, mw.hWnd)
+		win.SetParent(tb.HWnd, mw.HWnd)
 	}
 
 	mw.toolBar = tb
@@ -142,7 +143,7 @@ func (mw *MainWindow) ClientBoundsPixels() Rectangle {
 
 func (mw *MainWindow) SetVisible(visible bool) {
 	if visible {
-		win.DrawMenuBar(mw.hWnd)
+		win.DrawMenuBar(mw.HWnd)
 
 		mw.clientComposite.RequestLayout()
 	}
@@ -163,7 +164,7 @@ func (mw *MainWindow) applyFont(font *Font) {
 }
 
 func (mw *MainWindow) Fullscreen() bool {
-	return win.GetWindowLong(mw.hWnd, win.GWL_STYLE)&win.WS_OVERLAPPEDWINDOW == 0
+	return win.GetWindowLong(mw.HWnd, win.GWL_STYLE)&win.WS_OVERLAPPEDWINDOW == 0
 }
 
 func (mw *MainWindow) SetFullscreen(fullscreen bool) error {
@@ -179,11 +180,11 @@ func (mw *MainWindow) SetFullscreen(fullscreen bool) error {
 			mw.windowPlacement = new(win.WINDOWPLACEMENT)
 		}
 
-		if !win.GetWindowPlacement(mw.hWnd, mw.windowPlacement) {
+		if !win.GetWindowPlacement(mw.HWnd, mw.windowPlacement) {
 			return lastError("GetWindowPlacement")
 		}
 		if !win.GetMonitorInfo(win.MonitorFromWindow(
-			mw.hWnd, win.MONITOR_DEFAULTTOPRIMARY), &mi) {
+			mw.HWnd, win.MONITOR_DEFAULTTOPRIMARY), &mi) {
 
 			return newError("GetMonitorInfo")
 		}
@@ -193,7 +194,7 @@ func (mw *MainWindow) SetFullscreen(fullscreen bool) error {
 		}
 
 		if r := mi.RcMonitor; !win.SetWindowPos(
-			mw.hWnd, win.HWND_TOP,
+			mw.HWnd, win.HWND_TOP,
 			r.Left, r.Top, r.Right-r.Left, r.Bottom-r.Top,
 			win.SWP_FRAMECHANGED|win.SWP_NOOWNERZORDER) {
 
@@ -204,11 +205,11 @@ func (mw *MainWindow) SetFullscreen(fullscreen bool) error {
 			return err
 		}
 
-		if !win.SetWindowPlacement(mw.hWnd, mw.windowPlacement) {
+		if !win.SetWindowPlacement(mw.HWnd, mw.windowPlacement) {
 			return lastError("SetWindowPlacement")
 		}
 
-		if !win.SetWindowPos(mw.hWnd, 0, 0, 0, 0, 0, win.SWP_FRAMECHANGED|win.SWP_NOMOVE|
+		if !win.SetWindowPos(mw.HWnd, 0, 0, 0, 0, 0, win.SWP_FRAMECHANGED|win.SWP_NOMOVE|
 			win.SWP_NOOWNERZORDER|win.SWP_NOSIZE|win.SWP_NOZORDER) {
 
 			return lastError("SetWindowPos")

@@ -52,7 +52,7 @@ func (s *Static) init(widget Widget, parent Container, style uint32) error {
 		win.CW_USEDEFAULT,
 		win.CW_USEDEFAULT,
 		win.CW_USEDEFAULT,
-		s.hWnd,
+		s.HWnd,
 		0,
 		0,
 		nil,
@@ -260,7 +260,7 @@ func (s *Static) updateStaticBounds() {
 func (s *Static) WndProc(hwnd win.HWND, msg uint32, wp, lp uintptr) uintptr {
 	switch msg {
 	case win.WM_CTLCOLORSTATIC:
-		if hBrush := s.handleWMCTLCOLOR(wp, uintptr(s.hWnd)); hBrush != 0 {
+		if hBrush := s.handleWMCTLCOLOR(wp, uintptr(s.HWnd)); hBrush != 0 {
 			return hBrush
 		}
 

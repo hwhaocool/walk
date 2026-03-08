@@ -2,6 +2,7 @@
 // Use of lb source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
@@ -204,7 +205,7 @@ func (lb *ListBox) itemString(index int) string {
 	}
 }
 
-//insert one item from list model
+// insert one item from list model
 func (lb *ListBox) insertItemAt(index int) error {
 	str := lb.itemString(index)
 	lp := uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(str)))
@@ -519,12 +520,12 @@ func (lb *ListBox) SetPrecision(value int) {
 
 // calculateMaxItemTextWidth returns maximum item text width in native pixels.
 func (lb *ListBox) calculateMaxItemTextWidth() int {
-	hdc := win.GetDC(lb.hWnd)
+	hdc := win.GetDC(lb.HWnd)
 	if hdc == 0 {
 		newError("GetDC failed")
 		return -1
 	}
-	defer win.ReleaseDC(lb.hWnd, hdc)
+	defer win.ReleaseDC(lb.HWnd, hdc)
 
 	hFontOld := win.SelectObject(hdc, win.HGDIOBJ(lb.Font().handleForDPI(lb.DPI())))
 	defer win.SelectObject(hdc, hFontOld)
@@ -664,7 +665,7 @@ func (lb *ListBox) WndProc(hwnd win.HWND, msg uint32, wParam, lParam uintptr) ui
 		lb.style.bounds = rectangleFromRECT(dis.RcItem)
 		lb.style.dpi = lb.DPI()
 		lb.style.state = dis.ItemState
-		lb.style.hwnd = lb.hWnd
+		lb.style.hwnd = lb.HWnd
 		lb.style.hdc = dis.HDC
 		lb.style.Font = lb.Font()
 
@@ -674,7 +675,7 @@ func (lb *ListBox) WndProc(hwnd win.HWND, msg uint32, wParam, lParam uintptr) ui
 
 		var hTheme win.HTHEME
 		if !lb.style.highContrastActive {
-			if hTheme = win.OpenThemeData(lb.hWnd, syscall.StringToUTF16Ptr("Listview")); hTheme != 0 {
+			if hTheme = win.OpenThemeData(lb.HWnd, syscall.StringToUTF16Ptr("Listview")); hTheme != 0 {
 				defer win.CloseThemeData(hTheme)
 			}
 		}
@@ -758,7 +759,7 @@ func (lb *ListBox) WndProc(hwnd win.HWND, msg uint32, wParam, lParam uintptr) ui
 			var tme win.TRACKMOUSEEVENT
 			tme.CbSize = uint32(unsafe.Sizeof(tme))
 			tme.DwFlags = win.TME_LEAVE
-			tme.HwndTrack = lb.hWnd
+			tme.HwndTrack = lb.HWnd
 
 			lb.trackingMouseEvent = win.TrackMouseEvent(&tme)
 		}
@@ -779,7 +780,7 @@ func (lb *ListBox) WndProc(hwnd win.HWND, msg uint32, wParam, lParam uintptr) ui
 			if x >= rc.Left && x <= rc.Right && y >= rc.Top && y <= rc.Bottom {
 				lb.style.hoverIndex = index
 
-				win.InvalidateRect(lb.hWnd, &rc, true)
+				win.InvalidateRect(lb.HWnd, &rc, true)
 			}
 		}
 
@@ -846,7 +847,7 @@ func (lb *ListBox) invalidateItem(index int) {
 	var rc win.RECT
 	lb.SendMessage(win.LB_GETITEMRECT, uintptr(index), uintptr(unsafe.Pointer(&rc)))
 
-	win.InvalidateRect(lb.hWnd, &rc, true)
+	win.InvalidateRect(lb.HWnd, &rc, true)
 }
 
 func (lb *ListBox) CreateLayoutItem(ctx *LayoutContext) LayoutItem {

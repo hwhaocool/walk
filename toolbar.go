@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
@@ -128,11 +129,11 @@ func (tb *ToolBar) ApplyDPI(dpi int) {
 	}
 
 	tb.hFont = tb.Font().handleForDPI(tb.DPI())
-	setWindowFont(tb.hWnd, tb.hFont)
+	setWindowFont(tb.HWnd, tb.hFont)
 }
 
 func (tb *ToolBar) Orientation() Orientation {
-	style := win.GetWindowLong(tb.hWnd, win.GWL_STYLE)
+	style := win.GetWindowLong(tb.HWnd, win.GWL_STYLE)
 
 	if style&win.CCS_VERT > 0 {
 		return Vertical
@@ -291,7 +292,7 @@ func (tb *ToolBar) WndProc(hwnd win.HWND, msg uint32, wParam, lParam uintptr) ui
 
 				p := win.POINT{r.Left, r.Bottom}
 
-				if !win.ClientToScreen(tb.hWnd, &p) {
+				if !win.ClientToScreen(tb.HWnd, &p) {
 					break
 				}
 
@@ -302,7 +303,7 @@ func (tb *ToolBar) WndProc(hwnd win.HWND, msg uint32, wParam, lParam uintptr) ui
 					win.TPM_NOANIMATION,
 					p.X,
 					p.Y,
-					tb.hWnd,
+					tb.HWnd,
 					nil)
 
 				return win.TBDDRET_DEFAULT

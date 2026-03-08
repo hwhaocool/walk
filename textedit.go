@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
@@ -178,7 +179,7 @@ func (te *TextEdit) SetCompactHeight(enabled bool) {
 }
 
 func (te *TextEdit) TextAlignment() Alignment1D {
-	switch win.GetWindowLong(te.hWnd, win.GWL_STYLE) & (win.ES_LEFT | win.ES_CENTER | win.ES_RIGHT) {
+	switch win.GetWindowLong(te.HWnd, win.GWL_STYLE) & (win.ES_LEFT | win.ES_CENTER | win.ES_RIGHT) {
 	case win.ES_CENTER:
 		return AlignCenter
 
@@ -282,7 +283,7 @@ func (te *TextEdit) ContextMenuLocation() Point {
 	}
 	res := uint32(te.SendMessage(win.EM_POSFROMCHAR, uintptr(idx), 0))
 	pt := win.POINT{int32(win.LOWORD(res)), int32(win.HIWORD(res))}
-	windowTrimToClientBounds(te.hWnd, &pt)
+	windowTrimToClientBounds(te.HWnd, &pt)
 	return pointPixelsFromPOINT(pt)
 }
 

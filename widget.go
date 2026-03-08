@@ -155,11 +155,11 @@ func (wb *WidgetBase) init(widget Widget) error {
 }
 
 func (wb *WidgetBase) Dispose() {
-	if wb.hWnd == 0 {
+	if wb.HWnd == 0 {
 		return
 	}
 
-	if wb.parent != nil && win.GetParent(wb.hWnd) == wb.parent.Handle() {
+	if wb.parent != nil && win.GetParent(wb.HWnd) == wb.parent.Handle() {
 		wb.SetParent(nil)
 	}
 
@@ -302,7 +302,7 @@ func (wb *WidgetBase) SetParent(parent Container) (err error) {
 		return nil
 	}
 
-	style := uint32(win.GetWindowLong(wb.hWnd, win.GWL_STYLE))
+	style := uint32(win.GetWindowLong(wb.HWnd, win.GWL_STYLE))
 	if style == 0 {
 		return lastError("GetWindowLong")
 	}
@@ -313,11 +313,11 @@ func (wb *WidgetBase) SetParent(parent Container) (err error) {
 		style &^= win.WS_CHILD
 		style |= win.WS_POPUP
 
-		if win.SetParent(wb.hWnd, 0) == 0 {
+		if win.SetParent(wb.HWnd, 0) == 0 {
 			return lastError("SetParent")
 		}
 		win.SetLastError(0)
-		if win.SetWindowLong(wb.hWnd, win.GWL_STYLE, int32(style)) == 0 {
+		if win.SetWindowLong(wb.HWnd, win.GWL_STYLE, int32(style)) == 0 {
 			return lastError("SetWindowLong")
 		}
 	} else {
@@ -325,22 +325,22 @@ func (wb *WidgetBase) SetParent(parent Container) (err error) {
 		style &^= win.WS_POPUP
 
 		win.SetLastError(0)
-		if win.SetWindowLong(wb.hWnd, win.GWL_STYLE, int32(style)) == 0 {
+		if win.SetWindowLong(wb.HWnd, win.GWL_STYLE, int32(style)) == 0 {
 			return lastError("SetWindowLong")
 		}
-		if win.SetParent(wb.hWnd, parent.Handle()) == 0 {
+		if win.SetParent(wb.HWnd, parent.Handle()) == 0 {
 			return lastError("SetParent")
 		}
 
 		if cb := parent.AsContainerBase(); cb != nil {
-			win.SetWindowLong(wb.hWnd, win.GWL_ID, cb.NextChildID())
+			win.SetWindowLong(wb.HWnd, win.GWL_ID, cb.NextChildID())
 		}
 	}
 
 	b := wb.BoundsPixels()
 
 	if !win.SetWindowPos(
-		wb.hWnd,
+		wb.HWnd,
 		win.HWND_BOTTOM,
 		int32(b.X),
 		int32(b.Y),
@@ -373,7 +373,7 @@ func (wb *WidgetBase) SetParent(parent Container) (err error) {
 		oldChildren.Remove(widget)
 	}
 
-	if newChildren != nil && !newChildren.containsHandle(wb.hWnd) {
+	if newChildren != nil && !newChildren.containsHandle(wb.HWnd) {
 		newChildren.Add(widget)
 	}
 
@@ -381,7 +381,7 @@ func (wb *WidgetBase) SetParent(parent Container) (err error) {
 }
 
 func (wb *WidgetBase) ForEachAncestor(f func(window Window) bool) {
-	hwnd := win.GetParent(wb.hWnd)
+	hwnd := win.GetParent(wb.HWnd)
 
 	for hwnd != 0 {
 		if window := windowFromHandle(hwnd); window != nil {

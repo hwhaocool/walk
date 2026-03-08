@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
@@ -137,7 +138,7 @@ func (cb *ContainerBase) SetDataBinder(db *DataBinder) {
 		var boundWidgets []Widget
 
 		walkDescendants(cb.window, func(w Window) bool {
-			if w.Handle() == cb.hWnd {
+			if w.Handle() == cb.HWnd {
 				return true
 			}
 
@@ -198,8 +199,8 @@ func (cb *ContainerBase) RestoreState() error {
 func (cb *ContainerBase) doPaint() error {
 	var ps win.PAINTSTRUCT
 
-	hdc := win.BeginPaint(cb.hWnd, &ps)
-	defer win.EndPaint(cb.hWnd, &ps)
+	hdc := win.BeginPaint(cb.HWnd, &ps)
+	defer win.EndPaint(cb.HWnd, &ps)
 
 	canvas, err := newCanvasFromHDC(hdc)
 	if err != nil {
@@ -252,7 +253,7 @@ func (cb *ContainerBase) doPaint() error {
 			}
 		}
 
-		if widget != nil && widget.Parent() != nil && widget.Parent().Handle() == cb.hWnd {
+		if widget != nil && widget.Parent() != nil && widget.Parent().Handle() == cb.HWnd {
 			for _, effect := range widget.GraphicsEffects().items {
 				if effect == FocusEffect {
 					b := widget.BoundsPixels().toRECT()
@@ -329,7 +330,7 @@ func (cb *ContainerBase) WndProc(hwnd win.HWND, msg uint32, wParam, lParam uintp
 			}
 		} else {
 			// The window that sent the notification shall handle it itself.
-			hwndSrc := win.GetDlgItem(cb.hWnd, int32(win.LOWORD(uint32(wParam))))
+			hwndSrc := win.GetDlgItem(cb.HWnd, int32(win.LOWORD(uint32(wParam))))
 
 			var toolBarOnly bool
 			if hwndSrc == 0 {
@@ -394,7 +395,7 @@ func (cb *ContainerBase) onInsertingWidget(index int, widget Widget) (err error)
 }
 
 func (cb *ContainerBase) onInsertedWidget(index int, widget Widget) (err error) {
-	if parent := widget.Parent(); parent == nil || parent.Handle() != cb.hWnd {
+	if parent := widget.Parent(); parent == nil || parent.Handle() != cb.HWnd {
 		if err = widget.SetParent(cb.window.(Container)); err != nil {
 			return
 		}
@@ -412,7 +413,7 @@ func (cb *ContainerBase) onRemovingWidget(index int, widget Widget) (err error) 
 		return
 	}
 
-	if widget.Parent().Handle() == cb.hWnd {
+	if widget.Parent().Handle() == cb.HWnd {
 		err = widget.SetParent(nil)
 	}
 
@@ -429,7 +430,7 @@ func (cb *ContainerBase) onClearingWidgets() (err error) {
 	for i := cb.children.Len() - 1; i >= 0; i-- {
 		widget := cb.children.At(i)
 
-		if parent := widget.Parent(); parent != nil && parent.Handle() == cb.hWnd {
+		if parent := widget.Parent(); parent != nil && parent.Handle() == cb.HWnd {
 			if err = widget.SetParent(nil); err != nil {
 				return
 			}

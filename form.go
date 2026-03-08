@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
@@ -144,7 +145,7 @@ func (fb *FormBase) init(form Form) error {
 
 	version := win.GetVersion()
 	if (version&0xFF) > 6 || ((version&0xFF) == 6 && (version&0xFF00>>8) > 0) {
-		win.ChangeWindowMessageFilterEx(fb.hWnd, taskbarButtonCreatedMsgId, win.MSGFLT_ALLOW, nil)
+		win.ChangeWindowMessageFilterEx(fb.HWnd, taskbarButtonCreatedMsgId, win.MSGFLT_ALLOW, nil)
 	}
 
 	fb.performLayout, fb.layoutResults, fb.inSizeLoop, fb.updateStopwatch, fb.quitLayoutPerformer = startLayoutPerformer(fb)
@@ -153,7 +154,7 @@ func (fb *FormBase) init(form Form) error {
 }
 
 func (fb *FormBase) Dispose() {
-	if fb.hWnd != 0 {
+	if fb.HWnd != 0 {
 		fb.quitLayoutPerformer <- struct{}{}
 	}
 
@@ -481,7 +482,7 @@ func (fb *FormBase) Deactivating() *Event {
 }
 
 func (fb *FormBase) Activate() error {
-	if hwndPrevActive := win.SetActiveWindow(fb.hWnd); hwndPrevActive == 0 {
+	if hwndPrevActive := win.SetActiveWindow(fb.HWnd); hwndPrevActive == 0 {
 		return lastError("SetActiveWindow")
 	}
 
@@ -502,7 +503,7 @@ func (fb *FormBase) SetOwner(value Form) error {
 
 	win.SetLastError(0)
 	if 0 == win.SetWindowLong(
-		fb.hWnd,
+		fb.HWnd,
 		win.GWL_HWNDPARENT,
 		int32(ownerHWnd)) && win.GetLastError() != 0 {
 
@@ -601,7 +602,7 @@ func (fb *FormBase) SaveState() error {
 
 	wp.Length = uint32(unsafe.Sizeof(wp))
 
-	if !win.GetWindowPlacement(fb.hWnd, &wp) {
+	if !win.GetWindowPlacement(fb.HWnd, &wp) {
 		return lastError("GetWindowPlacement")
 	}
 
@@ -657,7 +658,7 @@ func (fb *FormBase) RestoreState() error {
 		wp.RcNormalPosition.Bottom = wp.RcNormalPosition.Top + int32(minSize.Height) - 1
 	}
 
-	if !win.SetWindowPlacement(fb.hWnd, &wp) {
+	if !win.SetWindowPlacement(fb.HWnd, &wp) {
 		return lastError("SetWindowPlacement")
 	}
 
@@ -856,7 +857,7 @@ func (fb *FormBase) WndProc(hwnd win.HWND, msg uint32, wParam, lParam uintptr) u
 		fb.SetIcon(fb.icon)
 
 		time.AfterFunc(time.Second, func() {
-			if fb.hWnd == 0 {
+			if fb.HWnd == 0 {
 				return
 			}
 			fb.Synchronize(func() {
@@ -881,7 +882,7 @@ func (fb *FormBase) WndProc(hwnd win.HWND, msg uint32, wParam, lParam uintptr) u
 		minor := version & 0xFF00 >> 8
 		// Check that the OS is Win 7 or later (Win 7 is v6.1).
 		if fb.progressIndicator == nil && (major > 6 || (major == 6 && minor > 0)) {
-			fb.progressIndicator, _ = newTaskbarList3(fb.hWnd)
+			fb.progressIndicator, _ = newTaskbarList3(fb.HWnd)
 		}
 
 	case taskbarCreatedMsgId:

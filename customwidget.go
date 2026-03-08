@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
@@ -122,7 +123,7 @@ func (cw *CustomWidget) WndProc(hwnd win.HWND, msg uint32, wParam, lParam uintpt
 
 		var hdc win.HDC
 		if wParam == 0 {
-			hdc = win.BeginPaint(cw.hWnd, &ps)
+			hdc = win.BeginPaint(cw.HWnd, &ps)
 		} else {
 			hdc = win.HDC(wParam)
 		}
@@ -132,7 +133,7 @@ func (cw *CustomWidget) WndProc(hwnd win.HWND, msg uint32, wParam, lParam uintpt
 		}
 		defer func() {
 			if wParam == 0 {
-				win.EndPaint(cw.hWnd, &ps)
+				win.EndPaint(cw.HWnd, &ps)
 			}
 		}()
 

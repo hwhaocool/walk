@@ -53,7 +53,7 @@ func NewGroupBox(parent Container) (*GroupBox, error) {
 	gb.hWndGroupBox = win.CreateWindowEx(
 		0, syscall.StringToUTF16Ptr("BUTTON"), nil,
 		win.WS_CHILD|win.WS_VISIBLE|win.BS_GROUPBOX,
-		0, 0, 80, 24, gb.hWnd, 0, 0, nil)
+		0, 0, 80, 24, gb.HWnd, 0, 0, nil)
 	if gb.hWndGroupBox == 0 {
 		return nil, lastError("CreateWindowEx(BUTTON)")
 	}
@@ -68,7 +68,7 @@ func NewGroupBox(parent Container) (*GroupBox, error) {
 	if err != nil {
 		return nil, err
 	}
-	win.SetWindowLong(gb.checkBox.hWnd, win.GWL_ID, 2)
+	win.SetWindowLong(gb.checkBox.HWnd, win.GWL_ID, 2)
 
 	gb.SetCheckable(false)
 	gb.checkBox.SetChecked(true)
@@ -77,16 +77,16 @@ func NewGroupBox(parent Container) (*GroupBox, error) {
 		gb.applyEnabledFromCheckBox(gb.checkBox.Checked())
 	})
 
-	setWindowVisible(gb.checkBox.hWnd, false)
+	setWindowVisible(gb.checkBox.HWnd, false)
 
 	gb.composite, err = NewComposite(gb)
 	if err != nil {
 		return nil, err
 	}
-	win.SetWindowLong(gb.composite.hWnd, win.GWL_ID, 3)
+	win.SetWindowLong(gb.composite.HWnd, win.GWL_ID, 3)
 	gb.composite.name = "composite"
 
-	win.SetWindowPos(gb.checkBox.hWnd, win.HWND_TOP, 0, 0, 0, 0, win.SWP_NOMOVE|win.SWP_NOSIZE)
+	win.SetWindowPos(gb.checkBox.HWnd, win.HWND_TOP, 0, 0, 0, 0, win.SWP_NOMOVE|win.SWP_NOSIZE)
 
 	gb.SetBackground(NullBrush())
 
@@ -318,7 +318,7 @@ func (gb *GroupBox) WndProc(hwnd win.HWND, msg uint32, wParam, lParam uintptr) u
 			}
 
 		case win.WM_COMMAND:
-			hwndSrc := win.GetDlgItem(gb.hWnd, int32(win.LOWORD(uint32(wParam))))
+			hwndSrc := win.GetDlgItem(gb.HWnd, int32(win.LOWORD(uint32(wParam))))
 
 			if window := windowFromHandle(hwndSrc); window != nil {
 				window.WndProc(hwnd, msg, wParam, lParam)
@@ -331,7 +331,7 @@ func (gb *GroupBox) WndProc(hwnd win.HWND, msg uint32, wParam, lParam uintptr) u
 			gb.titleChangedPublisher.Publish()
 
 		case win.WM_PAINT:
-			win.UpdateWindow(gb.checkBox.hWnd)
+			win.UpdateWindow(gb.checkBox.HWnd)
 
 		case win.WM_WINDOWPOSCHANGED:
 			wp := (*win.WINDOWPOS)(unsafe.Pointer(lParam))

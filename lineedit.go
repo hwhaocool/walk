@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
@@ -9,9 +10,7 @@ package walk
 import (
 	"syscall"
 	"unsafe"
-)
 
-import (
 	"github.com/lxn/win"
 )
 
@@ -145,7 +144,7 @@ func (le *LineEdit) SetTextSelection(start, end int) {
 }
 
 func (le *LineEdit) TextAlignment() Alignment1D {
-	switch win.GetWindowLong(le.hWnd, win.GWL_STYLE) & (win.ES_LEFT | win.ES_CENTER | win.ES_RIGHT) {
+	switch win.GetWindowLong(le.HWnd, win.GWL_STYLE) & (win.ES_LEFT | win.ES_CENTER | win.ES_RIGHT) {
 	case win.ES_CENTER:
 		return AlignCenter
 
@@ -178,7 +177,7 @@ func (le *LineEdit) SetTextAlignment(alignment Alignment1D) error {
 }
 
 func (le *LineEdit) CaseMode() CaseMode {
-	style := uint32(win.GetWindowLong(le.hWnd, win.GWL_STYLE))
+	style := uint32(win.GetWindowLong(le.HWnd, win.GWL_STYLE))
 
 	if style&win.ES_UPPERCASE != 0 {
 		return CaseModeUpper
@@ -262,12 +261,12 @@ func (le *LineEdit) initCharWidth() {
 	le.charWidthFont = font
 	le.charWidth = 8
 
-	hdc := win.GetDC(le.hWnd)
+	hdc := win.GetDC(le.HWnd)
 	if hdc == 0 {
 		newError("GetDC failed")
 		return
 	}
-	defer win.ReleaseDC(le.hWnd, hdc)
+	defer win.ReleaseDC(le.HWnd, hdc)
 
 	defer win.SelectObject(hdc, win.SelectObject(hdc, win.HGDIOBJ(font.handleForDPI(le.DPI()))))
 

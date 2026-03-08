@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
@@ -187,7 +188,7 @@ func (sv *ScrollView) WndProc(hwnd win.HWND, msg uint32, wParam, lParam uintptr)
 			}
 
 		case win.WM_MOUSEWHEEL:
-			if win.GetWindowLong(sv.hWnd, win.GWL_STYLE)&win.WS_VSCROLL == 0 {
+			if win.GetWindowLong(sv.HWnd, win.GWL_STYLE)&win.WS_VSCROLL == 0 {
 				break
 			}
 
@@ -248,12 +249,12 @@ func (sv *ScrollView) updateScrollBars() {
 
 	si.NMax = int32(compositeSize.Width - 1)
 	si.NPage = uint32(size.Width)
-	win.SetScrollInfo(sv.hWnd, win.SB_HORZ, &si, false)
+	win.SetScrollInfo(sv.HWnd, win.SB_HORZ, &si, false)
 	newCompositeBounds.X = sv.scroll(win.SB_HORZ, win.SB_THUMBPOSITION)
 
 	si.NMax = int32(compositeSize.Height - 1)
 	si.NPage = uint32(size.Height)
-	win.SetScrollInfo(sv.hWnd, win.SB_VERT, &si, false)
+	win.SetScrollInfo(sv.HWnd, win.SB_VERT, &si, false)
 	newCompositeBounds.Y = sv.scroll(win.SB_VERT, win.SB_THUMBPOSITION)
 
 	sv.composite.SetBoundsPixels(newCompositeBounds)
@@ -266,7 +267,7 @@ func (sv *ScrollView) scroll(sb int32, cmd uint16) int {
 	si.CbSize = uint32(unsafe.Sizeof(si))
 	si.FMask = win.SIF_PAGE | win.SIF_POS | win.SIF_RANGE | win.SIF_TRACKPOS
 
-	win.GetScrollInfo(sv.hWnd, sb, &si)
+	win.GetScrollInfo(sv.HWnd, sb, &si)
 
 	pos = si.NPos
 
@@ -296,7 +297,7 @@ func (sv *ScrollView) scroll(sb int32, cmd uint16) int {
 
 	si.FMask = win.SIF_POS
 	si.NPos = pos
-	win.SetScrollInfo(sv.hWnd, sb, &si, true)
+	win.SetScrollInfo(sv.HWnd, sb, &si, true)
 
 	return -int(pos)
 }
@@ -359,10 +360,10 @@ func (sv *ScrollView) CreateLayoutItem(ctx *LayoutContext) LayoutItem {
 	si.CbSize = uint32(unsafe.Sizeof(si))
 	si.FMask = win.SIF_POS | win.SIF_RANGE
 
-	win.GetScrollInfo(sv.hWnd, win.SB_HORZ, &si)
+	win.GetScrollInfo(sv.HWnd, win.SB_HORZ, &si)
 	svli.scrollX = float64(si.NPos) / float64(si.NMax)
 
-	win.GetScrollInfo(sv.hWnd, win.SB_VERT, &si)
+	win.GetScrollInfo(sv.HWnd, win.SB_VERT, &si)
 	svli.scrollY = float64(si.NPos) / float64(si.NMax)
 
 	return svli

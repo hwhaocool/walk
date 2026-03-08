@@ -2,15 +2,14 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
 
 import (
 	"unsafe"
-)
 
-import (
 	"github.com/lxn/win"
 )
 
@@ -86,14 +85,14 @@ func (sb *SplitButton) WndProc(hwnd win.HWND, msg uint32, wParam, lParam uintptr
 
 			p := win.POINT{dd.RcButton.Left, dd.RcButton.Bottom}
 
-			win.ClientToScreen(sb.hWnd, &p)
+			win.ClientToScreen(sb.HWnd, &p)
 
 			win.TrackPopupMenuEx(
 				sb.menu.hMenu,
 				win.TPM_NOANIMATION,
 				p.X,
 				p.Y,
-				sb.hWnd,
+				sb.HWnd,
 				nil)
 			return 0
 		}

@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
@@ -232,7 +233,7 @@ func applyEnabledToDescendants(window Window, enabled bool) {
 	wb.applyEnabled(enabled)
 
 	walkDescendants(window, func(w Window) bool {
-		if w.Handle() == wb.hWnd {
+		if w.Handle() == wb.HWnd {
 			return true
 		}
 
@@ -253,7 +254,7 @@ func applyFontToDescendants(window Window, font *Font) {
 	wb.applyFont(font)
 
 	walkDescendants(window, func(w Window) bool {
-		if w.Handle() == wb.hWnd {
+		if w.Handle() == wb.HWnd {
 			return true
 		}
 
@@ -280,7 +281,7 @@ func applySysColorsToDescendants(window Window) {
 	wb.ApplySysColors()
 
 	walkDescendants(window, func(w Window) bool {
-		if w.Handle() == wb.hWnd {
+		if w.Handle() == wb.HWnd {
 			return true
 		}
 
@@ -297,7 +298,7 @@ func applyDPIToDescendants(window Window, dpi int) {
 	wb.ApplyDPI(dpi)
 
 	walkDescendants(window, func(w Window) bool {
-		if w.Handle() == wb.hWnd {
+		if w.Handle() == wb.HWnd {
 			return true
 		}
 

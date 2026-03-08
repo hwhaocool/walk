@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
@@ -320,7 +321,7 @@ func (ne *NumberEdit) ValueChanged() *Event {
 
 // SetFocus sets the keyboard input focus to the NumberEdit.
 func (ne *NumberEdit) SetFocus() error {
-	if win.SetFocus(ne.edit.hWnd) == 0 {
+	if win.SetFocus(ne.edit.HWnd) == 0 {
 		return lastError("SetFocus")
 	}
 
@@ -374,7 +375,7 @@ func (ne *NumberEdit) SetSpinButtonsVisible(visible bool) error {
 			0,
 			16,
 			20,
-			ne.hWnd,
+			ne.HWnd,
 			0,
 			0,
 			nil)
@@ -382,7 +383,7 @@ func (ne *NumberEdit) SetSpinButtonsVisible(visible bool) error {
 			return lastError("CreateWindowEx")
 		}
 
-		win.SendMessage(ne.hWndUpDown, win.UDM_SETBUDDY, uintptr(ne.edit.hWnd), 0)
+		win.SendMessage(ne.hWndUpDown, win.UDM_SETBUDDY, uintptr(ne.edit.HWnd), 0)
 	} else {
 		if !win.DestroyWindow(ne.hWndUpDown) {
 			return lastError("DestroyWindow")
@@ -455,7 +456,7 @@ func (ne *NumberEdit) WndProc(hwnd win.HWND, msg uint32, wParam, lParam uintptr)
 		}
 
 		if ne.hWndUpDown != 0 {
-			win.SendMessage(ne.hWndUpDown, win.UDM_SETBUDDY, uintptr(ne.edit.hWnd), 0)
+			win.SendMessage(ne.hWndUpDown, win.UDM_SETBUDDY, uintptr(ne.edit.HWnd), 0)
 		}
 	}
 
@@ -966,7 +967,7 @@ func (nle *numberLineEdit) WndProc(hwnd win.HWND, msg uint32, wParam, lParam uin
 }
 
 func (nle *numberLineEdit) onFocusChanged() {
-	if ne := windowFromHandle(win.GetParent(nle.hWnd)); ne != nil {
+	if ne := windowFromHandle(win.GetParent(nle.HWnd)); ne != nil {
 		if wnd := windowFromHandle(win.GetParent(ne.Handle())); wnd != nil {
 			if _, ok := wnd.(Container); ok {
 				ne.(Widget).AsWidgetBase().invalidateBorderInParent()

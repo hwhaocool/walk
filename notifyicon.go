@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
@@ -91,7 +92,7 @@ func NewNotifyIcon(form Form) (*NotifyIcon, error) {
 	fb := form.AsFormBase()
 	// Add our notify icon to the status area and make sure it is hidden.
 	nid := win.NOTIFYICONDATA{
-		HWnd:             fb.hWnd,
+		HWnd:             fb.HWnd,
 		UFlags:           win.NIF_MESSAGE | win.NIF_STATE,
 		DwState:          win.NIS_HIDDEN,
 		DwStateMask:      win.NIS_HIDDEN,
@@ -119,21 +120,21 @@ func NewNotifyIcon(form Form) (*NotifyIcon, error) {
 
 	ni := &NotifyIcon{
 		id:          nid.UID,
-		hWnd:        fb.hWnd,
+		hWnd:        fb.HWnd,
 		contextMenu: menu,
 	}
 
 	menu.getDPI = ni.DPI
 
 	// Set our *NotifyIcon as user data for the message window.
-	win.SetWindowLongPtr(fb.hWnd, win.GWLP_USERDATA, uintptr(unsafe.Pointer(ni)))
+	win.SetWindowLongPtr(fb.HWnd, win.GWLP_USERDATA, uintptr(unsafe.Pointer(ni)))
 
 	notifyIcons[ni] = true
 	return ni, nil
 }
 
 func (ni *NotifyIcon) DPI() int {
-	fakeWb := WindowBase{hWnd: win.FindWindow(syscall.StringToUTF16Ptr("Shell_TrayWnd"), syscall.StringToUTF16Ptr(""))}
+	fakeWb := WindowBase{HWnd: win.FindWindow(syscall.StringToUTF16Ptr("Shell_TrayWnd"), syscall.StringToUTF16Ptr(""))}
 	return fakeWb.DPI()
 }
 

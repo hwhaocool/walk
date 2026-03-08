@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
@@ -9,9 +10,7 @@ package walk
 import (
 	"syscall"
 	"unsafe"
-)
 
-import (
 	"github.com/lxn/win"
 )
 
@@ -64,7 +63,7 @@ func webView_IOleInPlaceSite_Release(inPlaceSite *webViewIOleInPlaceSite) uintpt
 }
 
 func webView_IOleInPlaceSite_GetWindow(inPlaceSite *webViewIOleInPlaceSite, lphwnd *win.HWND) uintptr {
-	*lphwnd = inPlaceSite.inPlaceFrame.webView.hWnd
+	*lphwnd = inPlaceSite.inPlaceFrame.webView.HWnd
 
 	return win.S_OK
 }
@@ -90,7 +89,7 @@ func webView_IOleInPlaceSite_GetWindowContext(inPlaceSite *webViewIOleInPlaceSit
 	*lplpDoc = 0
 
 	lpFrameInfo.FMDIApp = win.FALSE
-	lpFrameInfo.HwndFrame = inPlaceSite.inPlaceFrame.webView.hWnd
+	lpFrameInfo.HwndFrame = inPlaceSite.inPlaceFrame.webView.HWnd
 	lpFrameInfo.Haccel = 0
 	lpFrameInfo.CAccelEntries = 0
 

@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
@@ -60,7 +61,7 @@ func NewTabWidget(parent Container) (*TabWidget, error) {
 	tw.hWndTab = win.CreateWindowEx(
 		0, syscall.StringToUTF16Ptr("SysTabControl32"), nil,
 		win.WS_CHILD|win.WS_CLIPSIBLINGS|win.WS_TABSTOP|win.WS_VISIBLE,
-		0, 0, 0, 0, tw.hWnd, 0, 0, nil)
+		0, 0, 0, 0, tw.HWnd, 0, 0, nil)
 	if tw.hWndTab == 0 {
 		return nil, lastError("CreateWindowEx")
 	}
@@ -250,7 +251,7 @@ func (tw *TabWidget) pageBounds() Rectangle {
 		r.Left,
 		r.Top,
 	}
-	if !win.ScreenToClient(tw.hWnd, &p) {
+	if !win.ScreenToClient(tw.HWnd, &p) {
 		newError("ScreenToClient failed")
 		return Rectangle{}
 	}
@@ -532,7 +533,7 @@ func (tw *TabWidget) onInsertedPage(index int, page *TabPage) (err error) {
 
 	page.SetVisible(false)
 
-	style := uint32(win.GetWindowLong(page.hWnd, win.GWL_STYLE))
+	style := uint32(win.GetWindowLong(page.HWnd, win.GWL_STYLE))
 	if style == 0 {
 		return lastError("GetWindowLong")
 	}
@@ -541,11 +542,11 @@ func (tw *TabWidget) onInsertedPage(index int, page *TabPage) (err error) {
 	style &^= win.WS_POPUP
 
 	win.SetLastError(0)
-	if win.SetWindowLong(page.hWnd, win.GWL_STYLE, int32(style)) == 0 {
+	if win.SetWindowLong(page.HWnd, win.GWL_STYLE, int32(style)) == 0 {
 		return lastError("SetWindowLong")
 	}
 
-	if win.SetParent(page.hWnd, tw.hWnd) == 0 {
+	if win.SetParent(page.HWnd, tw.HWnd) == 0 {
 		return lastError("SetParent")
 	}
 
@@ -568,7 +569,7 @@ func (tw *TabWidget) onInsertedPage(index int, page *TabPage) (err error) {
 func (tw *TabWidget) removePage(page *TabPage) (err error) {
 	page.SetVisible(false)
 
-	style := uint32(win.GetWindowLong(page.hWnd, win.GWL_STYLE))
+	style := uint32(win.GetWindowLong(page.HWnd, win.GWL_STYLE))
 	if style == 0 {
 		return lastError("GetWindowLong")
 	}
@@ -577,7 +578,7 @@ func (tw *TabWidget) removePage(page *TabPage) (err error) {
 	style |= win.WS_POPUP
 
 	win.SetLastError(0)
-	if win.SetWindowLong(page.hWnd, win.GWL_STYLE, int32(style)) == 0 {
+	if win.SetWindowLong(page.HWnd, win.GWL_STYLE, int32(style)) == 0 {
 		return lastError("SetWindowLong")
 	}
 

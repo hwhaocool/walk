@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
@@ -106,7 +107,7 @@ func NewComboBox(parent Container) (*ComboBox, error) {
 		return nil, err
 	}
 
-	editHwnd := win.GetWindow(cb.hWnd, win.GW_CHILD)
+	editHwnd := win.GetWindow(cb.HWnd, win.GW_CHILD)
 
 	win.SetWindowLongPtr(editHwnd, win.GWLP_USERDATA, uintptr(unsafe.Pointer(cb)))
 	cb.editOrigWndProcPtr = win.SetWindowLongPtr(editHwnd, win.GWLP_WNDPROC, comboBoxEditWndProcPtr)
@@ -524,12 +525,12 @@ func (cb *ComboBox) SetMaxLength(value int) {
 
 // calculateMaxItemTextWidth returns maximum item text width in native pixels.
 func (cb *ComboBox) calculateMaxItemTextWidth() int {
-	hdc := win.GetDC(cb.hWnd)
+	hdc := win.GetDC(cb.HWnd)
 	if hdc == 0 {
 		newError("GetDC failed")
 		return -1
 	}
-	defer win.ReleaseDC(cb.hWnd, hdc)
+	defer win.ReleaseDC(cb.HWnd, hdc)
 
 	hFontOld := win.SelectObject(hdc, win.HGDIOBJ(cb.Font().handleForDPI(cb.DPI())))
 	defer win.SelectObject(hdc, hFontOld)

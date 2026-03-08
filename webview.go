@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
@@ -10,9 +11,7 @@ import (
 	"fmt"
 	"syscall"
 	"unsafe"
-)
 
-import (
 	"github.com/lxn/win"
 )
 
@@ -147,9 +146,9 @@ func NewWebView(parent Container) (*WebView, error) {
 	}
 
 	var rect win.RECT
-	win.GetClientRect(wv.hWnd, &rect)
+	win.GetClientRect(wv.HWnd, &rect)
 
-	if hr := browserObject.DoVerb(win.OLEIVERB_SHOW, nil, (*win.IOleClientSite)(unsafe.Pointer(&wv.clientSite)), 0, wv.hWnd, &rect); win.FAILED(hr) {
+	if hr := browserObject.DoVerb(win.OLEIVERB_SHOW, nil, (*win.IOleClientSite)(unsafe.Pointer(&wv.clientSite)), 0, wv.HWnd, &rect); win.FAILED(hr) {
 		return nil, errorFromHRESULT("IOleObject.DoVerb", hr)
 	}
 

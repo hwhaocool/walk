@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
@@ -94,7 +95,7 @@ func (dlg *Dialog) DefaultButton() *PushButton {
 }
 
 func (dlg *Dialog) SetDefaultButton(button *PushButton) error {
-	if button != nil && !win.IsChild(dlg.hWnd, button.hWnd) {
+	if button != nil && !win.IsChild(dlg.HWnd, button.HWnd) {
 		return newError("not a descendant of the dialog")
 	}
 
@@ -128,7 +129,7 @@ func (dlg *Dialog) CancelButton() *PushButton {
 }
 
 func (dlg *Dialog) SetCancelButton(button *PushButton) error {
-	if button != nil && !win.IsChild(dlg.hWnd, button.hWnd) {
+	if button != nil && !win.IsChild(dlg.HWnd, button.HWnd) {
 		return newError("not a descendant of the dialog")
 	}
 
@@ -174,7 +175,7 @@ func (dlg *Dialog) Show() {
 			ob := dlg.owner.BoundsPixels()
 
 			if dlg.centerInOwnerWhenRun {
-				dlg.SetBoundsPixels(fitRectToScreen(dlg.hWnd, Rectangle{
+				dlg.SetBoundsPixels(fitRectToScreen(dlg.HWnd, Rectangle{
 					ob.X + (ob.Width-size.Width)/2,
 					ob.Y + (ob.Height-size.Height)/2,
 					size.Width,

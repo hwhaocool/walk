@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
@@ -86,7 +87,7 @@ func (pb *PushButton) WndProc(hwnd win.HWND, msg uint32, wParam, lParam uintptr)
 	switch msg {
 	case win.WM_GETDLGCODE:
 		hwndFocus := win.GetFocus()
-		if hwndFocus == pb.hWnd {
+		if hwndFocus == pb.HWnd {
 			form := ancestor(pb)
 			if form == nil {
 				break
