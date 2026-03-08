@@ -715,14 +715,14 @@ func (fb *FormBase) WndProc(hwnd win.HWND, msg uint32, wParam, lParam uintptr) u
 				win.SetFocus(fb.prevFocusHWnd)
 			}
 
-			fb.group.SetActiveForm(fb.window.(Form))
+			fb.Group.SetActiveForm(fb.window.(Form))
 
 			fb.activatingPublisher.Publish()
 
 		case win.WA_INACTIVE:
 			fb.prevFocusHWnd = win.GetFocus()
 
-			fb.group.SetActiveForm(nil)
+			fb.Group.SetActiveForm(nil)
 
 			fb.deactivatingPublisher.Publish()
 		}

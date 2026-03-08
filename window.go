@@ -404,7 +404,7 @@ type calcTextSizeInfo struct {
 // WindowBase implements many operations common to all Windows.
 type WindowBase struct {
 	nopActionListObserver
-	group                     *WindowGroup
+	Group                     *WindowGroup
 	window                    Window
 	form                      Form
 	HWnd                      win.HWND
@@ -637,7 +637,7 @@ func initWindowWithCfg(cfg *windowCfg) error {
 	//
 	// CreateGroup automatically increments the reference counter for the
 	// group. The counter will be decremented later in WindowBase.Dispose.
-	wb.group = wgm.CreateGroup(tid)
+	wb.Group = wgm.CreateGroup(tid)
 
 	succeeded := false
 	defer func() {
@@ -906,8 +906,8 @@ func (wb *WindowBase) Dispose() {
 	}
 
 	if hWnd != 0 {
-		wb.group.accClearHwndProps(wb.HWnd)
-		wb.group.Done()
+		wb.Group.accClearHwndProps(wb.HWnd)
+		wb.Group.Done()
 	}
 }
 
@@ -1923,7 +1923,7 @@ func (wb *WindowBase) RequestLayout() {
 		return
 	}
 
-	if fb := form.AsFormBase(); fb.group.ActiveForm() != form || fb.inProgressEventCount == 0 {
+	if fb := form.AsFormBase(); fb.Group.ActiveForm() != form || fb.inProgressEventCount == 0 {
 		fb.startLayout()
 	} else {
 		fb.layoutScheduled = true
@@ -2086,7 +2086,7 @@ func (wb *WindowBase) BoundsChanged() *Event {
 // Synchronize enqueues func f to be called some time later by the main
 // goroutine from inside a message loop.
 func (wb *WindowBase) Synchronize(f func()) {
-	wb.group.Synchronize(f)
+	wb.Group.Synchronize(f)
 
 	win.PostMessage(wb.HWnd, syncMsgId, 0, 0)
 }
@@ -2097,7 +2097,7 @@ func (wb *WindowBase) Synchronize(f func()) {
 // Any previously queued layout computations that have not yet been applied
 // will be replaced.
 func (wb *WindowBase) synchronizeLayout(result *formLayoutResult) {
-	wb.group.synchronizeLayout(result)
+	wb.Group.synchronizeLayout(result)
 
 	win.PostMessage(wb.HWnd, syncMsgId, 0, 0)
 }
@@ -2410,7 +2410,7 @@ func (wb *WindowBase) WndProc(hwnd win.HWND, msg uint32, wParam, lParam uintptr)
 				}
 			}
 
-			if wb.Form() == wb.group.ActiveForm() {
+			if wb.Form() == wb.Group.ActiveForm() {
 				wnd.AsWidgetBase().invalidateBorderInParent()
 			}
 		}

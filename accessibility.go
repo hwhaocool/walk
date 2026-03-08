@@ -182,7 +182,7 @@ func (a *Accessibility) SetValueMap(valueMap string) error {
 
 // accSetPropertyInt sets integer window property for Dynamic Annotation.
 func (a *Accessibility) accSetPropertyInt(hwnd win.HWND, idProp *win.MSAAPROPID, event uint32, value int32) error {
-	accPropServices := a.wb.group.accessibilityServices()
+	accPropServices := a.wb.Group.accessibilityServices()
 	if accPropServices == nil {
 		return newError("Dynamic Annotation not available")
 	}
@@ -200,7 +200,7 @@ func (a *Accessibility) accSetPropertyInt(hwnd win.HWND, idProp *win.MSAAPROPID,
 
 // accSetPropertyStr sets string window property for Dynamic Annotation.
 func (a *Accessibility) accSetPropertyStr(hwnd win.HWND, idProp *win.MSAAPROPID, event uint32, value string) error {
-	accPropServices := a.wb.group.accessibilityServices()
+	accPropServices := a.wb.Group.accessibilityServices()
 	if accPropServices == nil {
 		return newError("Dynamic Annotation not available")
 	}

@@ -38,7 +38,7 @@ func (fb *FormBase) mainLoop() int {
 			win.DispatchMessage(msg)
 		}
 
-		fb.group.RunSynchronized()
+		fb.Group.RunSynchronized()
 	}
 
 	return 0

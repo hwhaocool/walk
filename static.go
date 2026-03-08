@@ -60,7 +60,7 @@ func (s *Static) init(widget Widget, parent Container, style uint32) error {
 		return newError("creating static failed")
 	}
 
-	if err := s.group.toolTip.AddTool(s); err != nil {
+	if err := s.Group.toolTip.AddTool(s); err != nil {
 		return err
 	}
 
@@ -298,7 +298,7 @@ func staticWndProc(hwnd win.HWND, msg uint32, wp, lp uintptr) uintptr {
 			Pt:      win.POINT{X: int32(win.GET_X_LPARAM(lp)), Y: int32(win.GET_Y_LPARAM(lp))},
 		}
 
-		return s.group.toolTip.SendMessage(win.TTM_RELAYEVENT, 0, uintptr(unsafe.Pointer(&m)))
+		return s.Group.toolTip.SendMessage(win.TTM_RELAYEVENT, 0, uintptr(unsafe.Pointer(&m)))
 	}
 
 	return win.CallWindowProc(s.origStaticWndProcPtr, hwnd, msg, wp, lp)

@@ -131,7 +131,7 @@ func InitWidget(widget Widget, parent Window, className string, style, exStyle u
 func (wb *WidgetBase) init(widget Widget) error {
 	wb.graphicsEffects = newWidgetGraphicsEffectList(wb)
 
-	tt, err := wb.group.CreateToolTip()
+	tt, err := wb.Group.CreateToolTip()
 	if err != nil {
 		return err
 	}
@@ -163,7 +163,7 @@ func (wb *WidgetBase) Dispose() {
 		wb.SetParent(nil)
 	}
 
-	if tt := wb.group.ToolTip(); tt != nil {
+	if tt := wb.Group.ToolTip(); tt != nil {
 		tt.RemoveTool(wb.window.(Widget))
 	}
 
@@ -396,7 +396,7 @@ func (wb *WidgetBase) ForEachAncestor(f func(window Window) bool) {
 
 // ToolTipText returns the tool tip text of the WidgetBase.
 func (wb *WidgetBase) ToolTipText() string {
-	if tt := wb.group.ToolTip(); tt != nil {
+	if tt := wb.Group.ToolTip(); tt != nil {
 		return tt.Text(wb.window.(Widget))
 	}
 	return ""
@@ -404,7 +404,7 @@ func (wb *WidgetBase) ToolTipText() string {
 
 // SetToolTipText sets the tool tip text of the WidgetBase.
 func (wb *WidgetBase) SetToolTipText(s string) error {
-	if tt := wb.group.ToolTip(); tt != nil {
+	if tt := wb.Group.ToolTip(); tt != nil {
 		if err := tt.SetText(wb.window.(Widget), s); err != nil {
 			return err
 		}

@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
@@ -10,9 +11,7 @@ import (
 	"fmt"
 	"log"
 	"runtime/debug"
-)
 
-import (
 	"github.com/lxn/win"
 )
 
@@ -82,6 +81,10 @@ func newErr(message string) error {
 }
 
 func newError(message string) error {
+	return processError(newErr(message))
+}
+
+func NewError(message string) error {
 	return processError(newErr(message))
 }
 
