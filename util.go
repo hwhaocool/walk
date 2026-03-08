@@ -15,6 +15,7 @@ import (
 	"strings"
 	"syscall"
 	"time"
+	"unsafe"
 
 	"github.com/lxn/win"
 )
@@ -598,4 +599,15 @@ func scaleSize(value Size, scale float64) Size {
 		Width:  scaleInt(value.Width, scale),
 		Height: scaleInt(value.Height, scale),
 	}
+}
+
+// 输入一个文本指针，得到文本内容
+func GetStringByPtr(ptr uintptr) string {
+	if ptr == 0 {
+		return ""
+	}
+
+	textPtr := (*uint16)(unsafe.Pointer(ptr))
+	text := syscall.UTF16ToString((*[1 << 20]uint16)(unsafe.Pointer(textPtr))[:])
+	return text
 }

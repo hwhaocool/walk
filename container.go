@@ -273,7 +273,7 @@ func (cb *ContainerBase) doPaint() error {
 func (cb *ContainerBase) WndProc(hwnd win.HWND, msg uint32, wParam, lParam uintptr) uintptr {
 	switch msg {
 	case win.WM_CTLCOLOREDIT, win.WM_CTLCOLORSTATIC:
-		if hBrush := cb.handleWMCTLCOLOR(wParam, lParam); hBrush != 0 {
+		if hBrush := cb.HandleWMCTLCOLOR(wParam, lParam); hBrush != 0 {
 			return hBrush
 		}
 

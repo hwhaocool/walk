@@ -260,7 +260,7 @@ func (s *Static) updateStaticBounds() {
 func (s *Static) WndProc(hwnd win.HWND, msg uint32, wp, lp uintptr) uintptr {
 	switch msg {
 	case win.WM_CTLCOLORSTATIC:
-		if hBrush := s.handleWMCTLCOLOR(wp, uintptr(s.HWnd)); hBrush != 0 {
+		if hBrush := s.HandleWMCTLCOLOR(wp, uintptr(s.HWnd)); hBrush != 0 {
 			return hBrush
 		}
 

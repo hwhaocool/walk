@@ -2269,7 +2269,7 @@ func (wb *WindowBase) prepareDCForBackground(hdc win.HDC, hwnd win.HWND, brushWn
 	win.SetBrushOrgEx(hdc, bgRC.Left-rc.Left, bgRC.Top-rc.Top, nil)
 }
 
-func (wb *WindowBase) handleWMCTLCOLOR(wParam, lParam uintptr) uintptr {
+func (wb *WindowBase) HandleWMCTLCOLOR(wParam, lParam uintptr) uintptr {
 	hwnd := win.HWND(lParam)
 	hdc := win.HDC(wParam)
 

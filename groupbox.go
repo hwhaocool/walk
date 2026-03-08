@@ -313,7 +313,7 @@ func (gb *GroupBox) WndProc(hwnd win.HWND, msg uint32, wParam, lParam uintptr) u
 	if gb.composite != nil {
 		switch msg {
 		case win.WM_CTLCOLORSTATIC:
-			if hBrush := gb.handleWMCTLCOLOR(wParam, lParam); hBrush != 0 {
+			if hBrush := gb.HandleWMCTLCOLOR(wParam, lParam); hBrush != 0 {
 				return hBrush
 			}
 

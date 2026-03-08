@@ -435,7 +435,7 @@ func (ne *NumberEdit) WndProc(hwnd win.HWND, msg uint32, wParam, lParam uintptr)
 		}
 
 	case win.WM_CTLCOLOREDIT, win.WM_CTLCOLORSTATIC:
-		if hBrush := ne.handleWMCTLCOLOR(wParam, lParam); hBrush != 0 {
+		if hBrush := ne.HandleWMCTLCOLOR(wParam, lParam); hBrush != 0 {
 			return hBrush
 		}
 
