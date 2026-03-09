@@ -198,7 +198,7 @@ func (s *Static) shrinkable() bool {
 	return false
 }
 
-func (s *Static) updateStaticBounds() {
+func (s *Static) UpdateStaticBounds() {
 	var format DrawTextFormat
 
 	switch s.textAlignment {
@@ -271,7 +271,7 @@ func (s *Static) WndProc(hwnd win.HWND, msg uint32, wp, lp uintptr) uintptr {
 			break
 		}
 
-		s.updateStaticBounds()
+		s.UpdateStaticBounds()
 	}
 
 	return s.WidgetBase.WndProc(hwnd, msg, wp, lp)
