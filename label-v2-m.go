@@ -434,7 +434,7 @@ func (s *LabelV2M) OnPaint() {
 	s.RenderTarget.BeginDraw()
 	defer s.RenderTarget.EndDraw()
 
-	b, err := s.RenderTarget.CreateSolidColorBrush(
+	brushObj, err := s.RenderTarget.CreateSolidColorBrush(
 		&d2d.ColorF{R: 0, G: 255, B: 0, A: 1},
 		&d2d.BrushProperties{
 			Opacity:   1,
@@ -442,22 +442,35 @@ func (s *LabelV2M) OnPaint() {
 	if err != nil {
 		panic(err)
 	}
-	brushBlack := &b.IBrush
+	// brushBlack := &b.IBrush
 
+	cb := s.ClientBoundsPixels()
+	rect := &d2d.RectF{
+		Left:   0,
+		Top:    0,
+		Right:  float32(cb.Width),
+		Bottom: float32(cb.Height),
+	}
+
+	// 4. 创建画笔（务必在使用后释放）
+	// brushObj, _ := s.RenderTarget.CreateSolidColorBrush(
+	// 	&d2d.ColorF{
+	// 		R: float32(s.MyTextColor.R()) / 255.0,
+	// 		G: float32(s.MyTextColor.G()) / 255.0,
+	// 		B: float32(s.MyTextColor.B()) / 255.0,
+	// 		A: 1.0,
+	// 	}, nil)
+
+	// 核心绘制：开启彩色字体标志
 	s.RenderTarget.DrawText(
-		"✅你好拖拽❤️",
+		s.InnerText,
 		s.TextFormat,
-		&d2d.RectF{
-			Left:   0,
-			Top:    0,
-			Right:  50,
-			Bottom: 40,
-		},
-		brushBlack,
-		// 使用裁剪选项绘制文本
-		d2d.D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT,
-		// 使用自然测量模式
-		direct.DWRITE_MEASURING_MODE_NATURAL)
+		rect,
+		&brushObj.IBrush,
+		2|4,
+		direct.DWRITE_MEASURING_MODE_NATURAL,
+	)
+	brushObj.Release()
 
 }
 
@@ -524,25 +537,28 @@ func YellowLabelMWndProc(hwnd win.HWND, msg uint32, wp, lp uintptr) uintptr {
 	s := as.AsStatic()
 
 	switch msg {
-	case win.WM_NCHITTEST:
-		return win.HTCLIENT
-
-	case win.WM_CREATE:
-		// 创建独立资源
-		// createIndependentResource()
+	case win.WM_ERASEBKGND:
+		return 1 // 禁止系统擦除背景，减少闪烁
+	case win.WM_PAINT:
+		var ps win.PAINTSTRUCT
+		win.BeginPaint(hwnd, &ps)
+		s.OnPaint()
+		win.EndPaint(hwnd, &ps)
 		return 0
 	case win.WM_SIZE:
-		// 当窗口大小改变时，触发重绘
-		win.InvalidateRect(s.HwndStatic, nil, false)
+		s.releaseRenderTarget() // 大小改变必须重建渲染目标
 		return 0
-
-	case win.WM_PAINT:
-		s.OnPaint()
-		// return 0
-
 	}
 
 	return win.CallWindowProc(s.origStaticWndProcPtr, hwnd, msg, wp, lp)
+}
+
+// 释放 D2D 渲染目标，通常在 Resize 或设备丢失时调用
+func (s *LabelV2M) releaseRenderTarget() {
+	if s.RenderTarget != nil {
+		s.RenderTarget.Release()
+		s.RenderTarget = nil
+	}
 }
 
 func (s *LabelV2M) CreateLayoutItem(ctx *LayoutContext) LayoutItem {
