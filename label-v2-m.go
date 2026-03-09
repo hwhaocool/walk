@@ -132,29 +132,32 @@ func NewLabelV2WithStyle(parent Container, style uint32) (*LabelV2M, error) {
 
 	return l, nil
 }
-
 func (l *LabelV2M) newTextFormat() *dwrite.ITextFormat {
-	var textTF *dwrite.ITextFormat
+	// ★ 获取 DPI 缩放后的字体大小
+	// 96 DPI 下 12pt ≈ 16 DIP，根据需要调整基础值
+	fontSize := float32(l.IntFrom96DPI(16)) // 基础 16 DIP，自动随 DPI 缩放
 
-	// 创建新的文本格式
-	t, err := l.DwriteFactory.CreateTextFormat("Segoe UI Emoji", nil, dwrite.DWRITE_FONT_WEIGHT_REGULAR, dwrite.DWRITE_FONT_STYLE_NORMAL, dwrite.DWRITE_FONT_STRETCH_NORMAL, 10, "en-US")
+	t, err := l.DwriteFactory.CreateTextFormat(
+		"Segoe UI Emoji",
+		nil,
+		dwrite.DWRITE_FONT_WEIGHT_REGULAR,
+		dwrite.DWRITE_FONT_STYLE_NORMAL,
+		dwrite.DWRITE_FONT_STRETCH_NORMAL,
+		fontSize, // ★ 之前是 10，太小了
+		"en-US",
+	)
 	if err != nil {
 		panic(err)
 	}
 
-	// 设置文本对齐方式为左对齐
 	if err = t.SetTextAlignment(dwrite.DWRITE_TEXT_ALIGNMENT_LEADING); err != nil {
 		panic(err)
 	}
-
-	// 设置段落对齐方式为顶部对齐
 	if err = t.SetParagraphAlignment(dwrite.DWRITE_PARAGRAPH_ALIGNMENT_NEAR); err != nil {
 		panic(err)
 	}
 
-	textTF = t
-
-	return textTF
+	return t
 }
 
 func (s *LabelV2M) Init(widget Widget, parent Container, style uint32) error {
@@ -399,24 +402,20 @@ func (s *LabelV2M) UpdateStaticBounds() {
 func (l *LabelV2M) AsStatic() *LabelV2M {
 	return l
 }
-
 func (s *LabelV2M) OnPaint() {
-
-	// bp := parent.BoundsPixels()
-	// YellowLogger("LabelV2M", "NewLabelWithStyle", "BoundsPixels", bp)
-
 	bRect := s.BoundsPixels()
-	YellowLogger("LabelV2M", "OnPaint", "BoundsPixels", bRect, s.ClientBoundsPixels())
-	// s.Static.AsWidgetBase().RectangleTo96DPI()
-
 	if bRect.Width == 0 || bRect.Height == 0 {
 		return
 	}
 
 	if s.RenderTarget == nil {
-		YellowLogger("LabelV2M", "OnPaint", "HwndStatic", s.HwndStatic)
 		t, err := s.D2dFactory.CreateHwndRenderTarget(
-			&d2d.RenderTargetProperties{},
+			&d2d.RenderTargetProperties{
+				PixelFormat: d2d.PixelFormat{
+					Format:    d2d.DXGI_FORMAT_B8G8R8A8_UNORM,
+					AlphaMode: d2d.D2D1_ALPHA_MODE_PREMULTIPLIED,
+				},
+			},
 			&d2d.HwndRenderTargetProperties{
 				Hwnd: uintptr(s.HwndStatic),
 				PixelSize: d2d.SizeU{
@@ -429,20 +428,31 @@ func (s *LabelV2M) OnPaint() {
 			panic(err)
 		}
 		s.RenderTarget = t
+	} else {
+		// ★ 窗口大小变化时，更新 RenderTarget 尺寸
+		s.RenderTarget.Resize(&d2d.SizeU{
+			Width:  uint32(bRect.Width),
+			Height: uint32(bRect.Height),
+		})
 	}
 
 	s.RenderTarget.BeginDraw()
 	defer s.RenderTarget.EndDraw()
 
+	s.RenderTarget.Clear(&d2d.ColorF{R: 0.94, G: 0.94, B: 0.94, A: 1}) // 白色背景
+	// s.RenderTarget.Clear(&d2d.ColorF{R: 0, G: 0, B: 0, A: 0})
+
 	brushObj, err := s.RenderTarget.CreateSolidColorBrush(
-		&d2d.ColorF{R: 0, G: 255, B: 0, A: 1},
-		&d2d.BrushProperties{
-			Opacity:   1,
-			Transform: d2d.Matrix3x2F{{1, 0}, {0, 1}, {0, 0}}})
+		&d2d.ColorF{
+			R: float32(s.MyTextColor.R()) / 255.0,
+			G: float32(s.MyTextColor.G()) / 255.0,
+			B: float32(s.MyTextColor.B()) / 255.0,
+			A: 1.0,
+		}, nil)
 	if err != nil {
 		panic(err)
 	}
-	// brushBlack := &b.IBrush
+	defer brushObj.Release()
 
 	cb := s.ClientBoundsPixels()
 	rect := &d2d.RectF{
@@ -452,26 +462,14 @@ func (s *LabelV2M) OnPaint() {
 		Bottom: float32(cb.Height),
 	}
 
-	// 4. 创建画笔（务必在使用后释放）
-	// brushObj, _ := s.RenderTarget.CreateSolidColorBrush(
-	// 	&d2d.ColorF{
-	// 		R: float32(s.MyTextColor.R()) / 255.0,
-	// 		G: float32(s.MyTextColor.G()) / 255.0,
-	// 		B: float32(s.MyTextColor.B()) / 255.0,
-	// 		A: 1.0,
-	// 	}, nil)
-
-	// 核心绘制：开启彩色字体标志
 	s.RenderTarget.DrawText(
 		s.InnerText,
 		s.TextFormat,
 		rect,
 		&brushObj.IBrush,
-		2|4,
+		2|4, // CLIP | ENABLE_COLOR_FONT
 		direct.DWRITE_MEASURING_MODE_NATURAL,
 	)
-	brushObj.Release()
-
 }
 
 func (s *LabelV2M) WndProc(hwnd win.HWND, msg uint32, wp, lp uintptr) uintptr {
@@ -481,6 +479,9 @@ func (s *LabelV2M) WndProc(hwnd win.HWND, msg uint32, wp, lp uintptr) uintptr {
 		if hBrush := s.HandleWMCTLCOLOR(wp, uintptr(s.HWnd)); hBrush != 0 {
 			return hBrush
 		}
+	// case win.WM_CTLCOLORSTATIC:
+	// 	win.SetBkMode(win.HDC(wp), win.TRANSPARENT)
+	// 	return uintptr(win.GetStockObject(win.NULL_BRUSH))
 	case win.WM_SETTEXT:
 		fmt.Println("yellow WndProc SetText", s.text(), "<->", s.InnerText)
 
