@@ -9,6 +9,9 @@ import (
 	"syscall"
 	"unsafe"
 
+	"github.com/bupjae/direct"
+	"github.com/bupjae/direct/d2d"
+	"github.com/bupjae/direct/dwrite"
 	"github.com/lxn/win"
 )
 
@@ -50,11 +53,26 @@ type LabelV2M struct {
 	textChangedPublisher EventPublisher
 
 	origStaticWndProcPtr uintptr
+
+	// Direct2D 工厂对象
+	D2dFactory *d2d.IFactory
+	// 渲染目标对象
+	RenderTarget *d2d.IHwndRenderTarget
+	// 渐变停止集合
+	GradientStopCollection *d2d.IGradientStopCollection
+	// 黑色画笔
+	BrushBlack *d2d.IBrush
+	// 渐变画笔
+	BrushGradient *d2d.IBrush
+
+	// DirectWrite 工厂对象
+	DwriteFactory *dwrite.IFactory
+	// 文本格式对象
+	TextFormat *dwrite.ITextFormat
 }
 
 func (s *LabelV2M) SetText(param1 string) error {
-	YellowLogger("YellowLabelM", "SetText", "param1", param1)
-
+	YellowLogger("LabelV2M", "SetText", "param1", param1)
 	s.InnerText = param1
 
 	if err := s.WidgetBase.SetText2(param1); err != nil {
@@ -94,7 +112,49 @@ func NewLabelV2WithStyle(parent Container, style uint32) (*LabelV2M, error) {
 		l.textChangedPublisher.Event()),
 	)
 
+	// 创建一个新的 Direct2D 工厂
+	d2dFactory, err := d2d.CreateFactory(
+		d2d.D2D1_FACTORY_TYPE_SINGLE_THREADED,
+		&d2d.FactoryOptions{DebugLevel: d2d.D2D1_DEBUG_LEVEL_NONE})
+	if err != nil {
+		panic(err)
+	}
+	l.D2dFactory = d2dFactory
+
+	// 创建一个新的 DirectWrite 工厂
+	l.DwriteFactory, err = dwrite.CreateFactory(dwrite.DWRITE_FACTORY_TYPE_SHARED)
+	if err != nil {
+		panic(err)
+	}
+
+	// 创建一个新的文本格式
+	l.TextFormat = l.newTextFormat()
+
 	return l, nil
+}
+
+func (l *LabelV2M) newTextFormat() *dwrite.ITextFormat {
+	var textTF *dwrite.ITextFormat
+
+	// 创建新的文本格式
+	t, err := l.DwriteFactory.CreateTextFormat("Segoe UI Emoji", nil, dwrite.DWRITE_FONT_WEIGHT_REGULAR, dwrite.DWRITE_FONT_STYLE_NORMAL, dwrite.DWRITE_FONT_STRETCH_NORMAL, 10, "en-US")
+	if err != nil {
+		panic(err)
+	}
+
+	// 设置文本对齐方式为左对齐
+	if err = t.SetTextAlignment(dwrite.DWRITE_TEXT_ALIGNMENT_LEADING); err != nil {
+		panic(err)
+	}
+
+	// 设置段落对齐方式为顶部对齐
+	if err = t.SetParagraphAlignment(dwrite.DWRITE_PARAGRAPH_ALIGNMENT_NEAR); err != nil {
+		panic(err)
+	}
+
+	textTF = t
+
+	return textTF
 }
 
 func (s *LabelV2M) Init(widget Widget, parent Container, style uint32) error {
@@ -228,7 +288,7 @@ func (s *LabelV2M) setTextAlignment(alignment Alignment2D) error {
 }
 
 func (s *LabelV2M) SetText2(text string) (changed bool, err error) {
-	fmt.Println("YellowLabelM", "SetText2", "text", s.text(), "<->", text)
+	YellowLogger("LabelV2M", "SetText2", "text", s.text(), "<->", text)
 
 	s.InnerText = text
 	if text == s.text() {
@@ -261,7 +321,7 @@ func (s *LabelV2M) SetTextColor(c Color) {
 func (s *LabelV2M) shrinkable() (ret bool) {
 
 	defer func() {
-		// fmt.Println("YellowLabelM", "shrinkable", "return", "ret", ret)
+		// fmt.Println("LabelV2M", "shrinkable", "return", "ret", ret)
 	}()
 
 	if em, ok := s.window.(interface{ EllipsisMode() EllipsisMode }); ok {
@@ -297,7 +357,7 @@ func (s *LabelV2M) UpdateStaticBounds() {
 	}
 
 	cb := s.ClientBoundsPixels()
-	YellowLogger("YellowLabelM", "UpdateStaticBounds", "ClientBoundsPixels", "cb", cb)
+	YellowLogger("LabelV2M", "UpdateStaticBounds", "ClientBoundsPixels", "cb", cb)
 
 	if shrinkable := s.shrinkable(); shrinkable || format&TextVCenter != 0 || format&TextBottom != 0 {
 		var size Size
@@ -326,7 +386,7 @@ func (s *LabelV2M) UpdateStaticBounds() {
 		}
 	}
 
-	YellowLogger("YellowLabelM", "UpdateStaticBounds", "ClientBoundsPixels", "cb2", cb)
+	YellowLogger("LabelV2M", "UpdateStaticBounds", "ClientBoundsPixels", "cb2", cb)
 
 	win.MoveWindow(s.HwndStatic, int32(cb.X), int32(cb.Y), int32(cb.Width), int32(cb.Height), true)
 	// win.MoveWindow(s.HwndStatic, int32(0), int32(0), int32(500), int32(500), true)
@@ -342,123 +402,67 @@ func (l *LabelV2M) AsStatic() *LabelV2M {
 
 func (s *LabelV2M) OnPaint() {
 
+	// bp := parent.BoundsPixels()
+	// YellowLogger("LabelV2M", "NewLabelWithStyle", "BoundsPixels", bp)
+
 	bRect := s.BoundsPixels()
-	YellowLogger("YellowLabelM", "OnPaint", "BoundsPixels", bRect, s.ClientBoundsPixels())
+	YellowLogger("LabelV2M", "OnPaint", "BoundsPixels", bRect, s.ClientBoundsPixels())
+	// s.Static.AsWidgetBase().RectangleTo96DPI()
 
 	if bRect.Width == 0 || bRect.Height == 0 {
 		return
 	}
 
-	// 获取设备上下文
-	hdc := win.GetDC(s.HwndStatic)
-	defer win.ReleaseDC(s.HwndStatic, hdc)
-
-	if hdc == 0 {
-		return
+	if s.RenderTarget == nil {
+		YellowLogger("LabelV2M", "OnPaint", "HwndStatic", s.HwndStatic)
+		t, err := s.D2dFactory.CreateHwndRenderTarget(
+			&d2d.RenderTargetProperties{},
+			&d2d.HwndRenderTargetProperties{
+				Hwnd: uintptr(s.HwndStatic),
+				PixelSize: d2d.SizeU{
+					Width:  uint32(bRect.Width),
+					Height: uint32(bRect.Height),
+				},
+			},
+		)
+		if err != nil {
+			panic(err)
+		}
+		s.RenderTarget = t
 	}
 
-	// 设置背景为透明
-	win.SetBkMode(hdc, win.TRANSPARENT)
+	s.RenderTarget.BeginDraw()
+	defer s.RenderTarget.EndDraw()
 
-	// 设置文本颜色（使用 s.MyTextColor）
-	textColor := win.RGB(
-		s.MyTextColor.R(),
-		s.MyTextColor.G(),
-		s.MyTextColor.B())
-	win.SetTextColor(hdc, textColor)
-
-	// 获取当前字体或设置默认字体
-	hFont := s.Font().handleForDPI(s.DPI())
-	var deleteEmojiFont bool
-
-	if hFont == 0 {
-		// 使用 Segoe UI Emoji 字体以支持 emoji
-		var lf win.LOGFONT
-		lf.LfHeight = -win.MulDiv(int32(s.Font().PointSize()), int32(s.DPI()), 72)
-		if s.Font().Bold() {
-			lf.LfWeight = win.FW_BOLD
-		} else {
-			lf.LfWeight = win.FW_NORMAL
-		}
-		if s.Font().Italic() {
-			lf.LfItalic = 1
-		}
-		if s.Font().Underline() {
-			lf.LfUnderline = 1
-		}
-		if s.Font().StrikeOut() {
-			lf.LfStrikeOut = 1
-		}
-		lf.LfCharSet = win.DEFAULT_CHARSET
-		lf.LfOutPrecision = win.OUT_TT_PRECIS
-		lf.LfClipPrecision = win.CLIP_DEFAULT_PRECIS
-		lf.LfQuality = win.CLEARTYPE_QUALITY
-		lf.LfPitchAndFamily = win.VARIABLE_PITCH | win.FF_DONTCARE
-
-		fontName := "Segoe UI Emoji"
-		src := syscall.StringToUTF16(fontName)
-		dest := lf.LfFaceName[:]
-		copy(dest, src)
-
-		hFont = win.CreateFontIndirect(&lf)
-		deleteEmojiFont = (hFont != 0)
-	}
-	oldFont := win.SelectObject(hdc, win.HGDIOBJ(hFont))
-	defer win.SelectObject(hdc, oldFont)
-	defer func() {
-		if deleteEmojiFont && hFont != 0 {
-			win.DeleteObject(win.HGDIOBJ(hFont))
-		}
-	}()
-
-	// 设置绘制格式
-	var drawFormat uint32 = win.DT_SINGLELINE | win.DT_VCENTER
-
-	// 设置水平对齐
-	switch s.TextAlignment {
-	case AlignHNearVNear, AlignHNearVCenter, AlignHNearVFar:
-		drawFormat |= win.DT_LEFT
-	case AlignHCenterVNear, AlignHCenterVCenter, AlignHCenterVFar:
-		drawFormat |= win.DT_CENTER
-	case AlignHFarVNear, AlignHFarVCenter, AlignHFarVFar:
-		drawFormat |= win.DT_RIGHT
-	}
-
-	// 设置垂直对齐
-	switch s.TextAlignment {
-	case AlignHNearVNear, AlignHCenterVNear, AlignHFarVNear:
-		drawFormat |= win.DT_TOP
-	case AlignHNearVCenter, AlignHCenterVCenter, AlignHFarVCenter:
-		drawFormat |= win.DT_VCENTER
-	case AlignHNearVFar, AlignHCenterVFar, AlignHFarVFar:
-		drawFormat |= win.DT_BOTTOM
-	}
-
-	// 如果启了省略号模式，添加 DT_END_ELLIPSIS
-	if em, ok := s.window.(interface{ EllipsisMode() EllipsisMode }); ok {
-		if em.EllipsisMode() != EllipsisNone {
-			drawFormat |= win.DT_END_ELLIPSIS
-		}
-	}
-
-	// 使用 GDI 绘制文本，支持 emoji
-	rect := win.RECT{
-		Left:   0,
-		Top:    0,
-		Right:  int32(bRect.Width),
-		Bottom: int32(bRect.Height),
-	}
-	// 转换为 UTF16 指针
-	textUTF16, err := syscall.UTF16PtrFromString(s.InnerText)
+	b, err := s.RenderTarget.CreateSolidColorBrush(
+		&d2d.ColorF{R: 0, G: 255, B: 0, A: 1},
+		&d2d.BrushProperties{
+			Opacity:   1,
+			Transform: d2d.Matrix3x2F{{1, 0}, {0, 1}, {0, 0}}})
 	if err != nil {
-		return
+		panic(err)
 	}
-	win.DrawTextEx(hdc, textUTF16, -1, &rect, drawFormat, nil)
+	brushBlack := &b.IBrush
+
+	s.RenderTarget.DrawText(
+		"✅你好拖拽❤️",
+		s.TextFormat,
+		&d2d.RectF{
+			Left:   0,
+			Top:    0,
+			Right:  50,
+			Bottom: 40,
+		},
+		brushBlack,
+		// 使用裁剪选项绘制文本
+		d2d.D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT,
+		// 使用自然测量模式
+		direct.DWRITE_MEASURING_MODE_NATURAL)
 
 }
 
 func (s *LabelV2M) WndProc(hwnd win.HWND, msg uint32, wp, lp uintptr) uintptr {
-	// YellowLogger("YellowLabelM", "WndProc", "msg", msg, "wp", wp, "lp", lp)
+	// YellowLogger("LabelV2M", "WndProc", "msg", msg, "wp", wp, "lp", lp)
 	switch msg {
 	case win.WM_CTLCOLORSTATIC:
 		if hBrush := s.HandleWMCTLCOLOR(wp, uintptr(s.HWnd)); hBrush != 0 {
@@ -473,25 +477,25 @@ func (s *LabelV2M) WndProc(hwnd win.HWND, msg uint32, wp, lp uintptr) uintptr {
 	case win.WM_SIZE:
 		bRect := s.BoundsPixels()
 
-		YellowLogger("YellowLabelM", "WndProc", "WM_SIZE", "hwnd", hwnd, "wp", wp, "lp", lp, "bRect", bRect)
+		YellowLogger("LabelV2M", "WndProc", "WM_SIZE", "hwnd", hwnd, "wp", wp, "lp", lp, "bRect", bRect)
 
 		// s.OnPaint()
 
 	case win.WM_WINDOWPOSCHANGED:
 		// 位置移动
 
-		YellowLogger("YellowLabelM", "WndProc", "WM_WINDOWPOSCHANGED", "hwnd", hwnd, "wp", wp, "lp", lp)
+		YellowLogger("LabelV2M", "WndProc", "WM_WINDOWPOSCHANGED", "hwnd", hwnd, "wp", wp, "lp", lp)
 		wp := (*win.WINDOWPOS)(unsafe.Pointer(lp))
 
 		if wp.Flags&win.SWP_NOSIZE != 0 {
-			YellowLogger("YellowLabelM", "WndProc", "WM_WINDOWPOSCHANGED", "break")
+			YellowLogger("LabelV2M", "WndProc", "WM_WINDOWPOSCHANGED", "break")
 			break
 		}
 
 		s.UpdateStaticBounds()
 
 	case win.WM_PAINT:
-		YellowLogger("YellowLabelM", "WndProc", "WM_PAINT", "hwnd", hwnd, "wp", wp, "lp", lp)
+		YellowLogger("LabelV2M", "WndProc", "WM_PAINT", "hwnd", hwnd, "wp", wp, "lp", lp)
 		var ps win.PAINTSTRUCT
 		win.BeginPaint(hwnd, &ps)
 		defer win.EndPaint(hwnd, &ps)
@@ -506,14 +510,14 @@ func (s *LabelV2M) WndProc(hwnd win.HWND, msg uint32, wp, lp uintptr) uintptr {
 
 func YellowLabelMWndProc(hwnd win.HWND, msg uint32, wp, lp uintptr) uintptr {
 	pHwnd := win.GetParent(hwnd)
-	YellowLogger("YellowLabelM", "YellowLabelMWndProc", "params", "hwnd", hwnd, "pHwnd", pHwnd, "msg", msg, "wp", wp, "lp", lp)
+	YellowLogger("LabelV2M", "YellowLabelMWndProc", "params", "hwnd", hwnd, "pHwnd", pHwnd, "msg", msg, "wp", wp, "lp", lp)
 
 	// hwnd 就是子窗口
 
-	// as, ok := WindowFromHandle(win.GetParent(hwnd)).(interface{ AsStatic() *YellowLabelM })
+	// as, ok := WindowFromHandle(win.GetParent(hwnd)).(interface{ AsStatic() *LabelV2M })
 	as, ok := WindowFromHandle(pHwnd).(interface{ AsStatic() *LabelV2M })
 	if !ok {
-		fmt.Println("YellowLabelMWndProc: not a YellowLabelM")
+		fmt.Println("YellowLabelMWndProc: not a LabelV2M")
 		return 0
 	}
 
