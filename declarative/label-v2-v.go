@@ -84,6 +84,8 @@ func (l LabelV2) Create(builder *Builder) error {
 
 		w.SetTextColor(l.TextColor)
 
+		w.InitTextFormat()
+
 		return nil
 	})
 }

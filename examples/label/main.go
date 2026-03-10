@@ -22,11 +22,15 @@ func main() {
 				},
 				Children: []Widget{
 					Label{
-						Text: "请选择文件，可以输入，也可以拖拽❤️",
+						Text: "2 ❤️ 2 22222222✔️哈哈🤭",
+						Font: Font{PointSize: 18},
+					},
+					Label{
+						Text: "2 ❤️ 2 22222222✔️哈哈🤭",
 					},
 					LabelV2{
 						EllipsisMode: EllipsisEnd,
-						Text:         "2 ❤️ 2 22222222",
+						Text:         "2 ❤️ 2 22222222✔️哈哈🤭",
 						Font:         Font{PointSize: 18, Family: "DejaVu Sans Mono"},
 					},
 				},

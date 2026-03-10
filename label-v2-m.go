@@ -127,24 +127,40 @@ func NewLabelV2WithStyle(parent Container, style uint32) (*LabelV2M, error) {
 		panic(err)
 	}
 
-	// 创建一个新的文本格式
-	l.TextFormat = l.newTextFormat()
-
 	return l, nil
 }
-func (l *LabelV2M) newTextFormat() *dwrite.ITextFormat {
+
+func (l *LabelV2M) InitTextFormat() {
+	// 创建一个新的文本格式
+	l.TextFormat = l.NewTextFormat()
+}
+
+func (l *LabelV2M) NewTextFormat() *dwrite.ITextFormat {
 	// ★ 获取 DPI 缩放后的字体大小
 	// 96 DPI 下 12pt ≈ 16 DIP，根据需要调整基础值
-	fontSize := float32(l.IntFrom96DPI(16)) // 基础 16 DIP，自动随 DPI 缩放
+
+	// 基础 16 DIP，自动随 DPI 缩放
+	// fontSize := float32(l.IntFrom96DPI(l.Font().PointSize()))
+	fontSize := float32(l.Font().PointSize())
+
+	// t, err := l.DwriteFactory.CreateTextFormat(
+	// 	"Segoe UI Emoji",
+	// 	nil,
+	// 	dwrite.DWRITE_FONT_WEIGHT_REGULAR,
+	// 	dwrite.DWRITE_FONT_STYLE_NORMAL,
+	// 	dwrite.DWRITE_FONT_STRETCH_NORMAL,
+	// 	fontSize, // ★ 之前是 10，太小了
+	// 	"en-US",
+	// )
 
 	t, err := l.DwriteFactory.CreateTextFormat(
-		"Segoe UI Emoji",
+		"Microsoft YaHei UI", // ★ 用常规字体做主字体，中文显示更好
 		nil,
 		dwrite.DWRITE_FONT_WEIGHT_REGULAR,
 		dwrite.DWRITE_FONT_STYLE_NORMAL,
 		dwrite.DWRITE_FONT_STRETCH_NORMAL,
-		fontSize, // ★ 之前是 10，太小了
-		"en-US",
+		fontSize,
+		"zh-CN", // ★ 改为中文 locale
 	)
 	if err != nil {
 		panic(err)
@@ -439,6 +455,8 @@ func (s *LabelV2M) OnPaint() {
 	s.RenderTarget.BeginDraw()
 	defer s.RenderTarget.EndDraw()
 
+	s.Parent().Background()
+
 	s.RenderTarget.Clear(&d2d.ColorF{R: 0.94, G: 0.94, B: 0.94, A: 1}) // 白色背景
 	// s.RenderTarget.Clear(&d2d.ColorF{R: 0, G: 0, B: 0, A: 0})
 
@@ -524,7 +542,7 @@ func (s *LabelV2M) WndProc(hwnd win.HWND, msg uint32, wp, lp uintptr) uintptr {
 
 func YellowLabelMWndProc(hwnd win.HWND, msg uint32, wp, lp uintptr) uintptr {
 	pHwnd := win.GetParent(hwnd)
-	YellowLogger("LabelV2M", "YellowLabelMWndProc", "params", "hwnd", hwnd, "pHwnd", pHwnd, "msg", msg, "wp", wp, "lp", lp)
+	// YellowLogger("LabelV2M", "YellowLabelMWndProc", "params", "hwnd", hwnd, "pHwnd", pHwnd, "msg", msg, "wp", wp, "lp", lp)
 
 	// hwnd 就是子窗口
 
