@@ -1610,7 +1610,7 @@ func (wb *WindowBase) calculateTextSizeImplForWidth(text string, width int) Size
 		return size
 	}
 
-	size := calculateTextSize(text, font, dpi, width, wb.HWnd)
+	size := CalculateTextSize(text, font, dpi, width, wb.HWnd)
 
 	wb.calcTextSizeInfo2TextSize[key] = size
 
@@ -1627,8 +1627,8 @@ func (wb *WindowBase) CalculateTextSizeForWidth(width int) Size {
 	return wb.calculateTextSizeImplForWidth(wb.text(), width)
 }
 
-// calculateTextSize calculates text size at specified DPI and for width in native pixels.
-func calculateTextSize(text string, font *Font, dpi int, width int, hwnd win.HWND) Size {
+// CalculateTextSize calculates text size at specified DPI and for width in native pixels.
+func CalculateTextSize(text string, font *Font, dpi int, width int, hwnd win.HWND) Size {
 	hdc := win.GetDC(hwnd)
 	if hdc == 0 {
 		newError("GetDC failed")
@@ -1638,13 +1638,13 @@ func calculateTextSize(text string, font *Font, dpi int, width int, hwnd win.HWN
 
 	var size Size
 	if width > 0 {
-		canvas, err := newCanvasFromHDC(hdc)
+		canvas, err := NewCanvasFromHDC(hdc)
 		if err != nil {
 			return size
 		}
 		defer canvas.Dispose()
 
-		bounds, err := canvas.measureTextForDPI(text, font, Rectangle{Width: width, Height: 9999999}, 0, dpi)
+		bounds, err := canvas.MeasureTextForDPI(text, font, Rectangle{Width: width, Height: 9999999}, 0, dpi)
 		if err != nil {
 			return size
 		}
@@ -1984,7 +1984,7 @@ func (wb *WindowBase) FocusedChanged() *Event {
 // Remember to call the Dispose method on the canvas to release resources,
 // when you no longer need it.
 func (wb *WindowBase) CreateCanvas() (*Canvas, error) {
-	return newCanvasFromWindow(wb.window)
+	return NewCanvasFromWindow(wb.window)
 }
 
 func (wb *WindowBase) setTheme(appName string) error {
@@ -2349,7 +2349,7 @@ func (wb *WindowBase) WndProc(hwnd win.HWND, msg uint32, wParam, lParam uintptr)
 
 		hdc := win.HDC(wParam)
 
-		canvas, err := newCanvasFromHDC(hdc)
+		canvas, err := NewCanvasFromHDC(hdc)
 		if err != nil {
 			break
 		}

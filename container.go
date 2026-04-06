@@ -202,7 +202,7 @@ func (cb *ContainerBase) doPaint() error {
 	hdc := win.BeginPaint(cb.HWnd, &ps)
 	defer win.EndPaint(cb.HWnd, &ps)
 
-	canvas, err := newCanvasFromHDC(hdc)
+	canvas, err := NewCanvasFromHDC(hdc)
 	if err != nil {
 		return err
 	}

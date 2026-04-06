@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
@@ -108,7 +109,7 @@ func (pfi *PaintFuncImage) draw(hdc win.HDC, location Point) error {
 }
 
 func (pfi *PaintFuncImage) drawStretched(hdc win.HDC, bounds Rectangle) error {
-	canvas, err := newCanvasFromHDC(hdc)
+	canvas, err := NewCanvasFromHDC(hdc)
 	if err != nil {
 		return err
 	}

@@ -2279,7 +2279,7 @@ func (tv *TableView) lvWndProc(origWndProcPtr uintptr, hwnd win.HWND, msg uint32
 						if brush, _ := NewSolidColorBrush(color); brush != nil {
 							defer brush.Dispose()
 
-							canvas, _ := newCanvasFromHDC(nmlvcd.Nmcd.Hdc)
+							canvas, _ := NewCanvasFromHDC(nmlvcd.Nmcd.Hdc)
 							canvas.FillRectanglePixels(brush, rectangleFromRECT(nmlvcd.Nmcd.Rc))
 						}
 					}
@@ -2573,7 +2573,7 @@ func tableViewHdrWndProc(hwnd win.HWND, msg uint32, wp, lp uintptr) uintptr {
 			break
 		}
 
-		size := calculateTextSize(text, tv.Font(), tv.DPI(), 0, hwnd)
+		size := CalculateTextSize(text, tv.Font(), tv.DPI(), 0, hwnd)
 		if size.Width <= rectangleFromRECT(rc).Width-int(win.SendMessage(hwnd, win.HDM_GETBITMAPMARGIN, 0, 0)) {
 			tv.Group.toolTip.setText(hwnd, "")
 			break

@@ -359,7 +359,7 @@ func (cs *CellStyle) Canvas() *Canvas {
 	}
 
 	if cs.hdc != 0 {
-		cs.canvas, _ = newCanvasFromHDC(cs.hdc)
+		cs.canvas, _ = NewCanvasFromHDC(cs.hdc)
 		cs.canvas.dpi = cs.dpi
 	}
 
@@ -430,7 +430,7 @@ func (lis *ListItemStyle) Canvas() *Canvas {
 	}
 
 	if lis.hdc != 0 {
-		lis.canvas, _ = newCanvasFromHDC(lis.hdc)
+		lis.canvas, _ = NewCanvasFromHDC(lis.hdc)
 		lis.canvas.dpi = lis.dpi
 	}
 

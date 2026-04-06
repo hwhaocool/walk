@@ -137,7 +137,7 @@ func (cw *CustomWidget) WndProc(hwnd win.HWND, msg uint32, wParam, lParam uintpt
 			}
 		}()
 
-		canvas, err := newCanvasFromHDC(hdc)
+		canvas, err := NewCanvasFromHDC(hdc)
 		if err != nil {
 			newError("newCanvasFromHDC failed")
 			break

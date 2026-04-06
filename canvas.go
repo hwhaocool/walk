@@ -90,7 +90,7 @@ func NewCanvasFromImage(image Image) (*Canvas, error) {
 		return (&Canvas{hdc: hdc, hBmpStock: hBmpStock, bitmap: img, dpi: img.dpi}).init()
 
 	case *Metafile:
-		c, err := newCanvasFromHDC(img.hdc)
+		c, err := NewCanvasFromHDC(img.hdc)
 		if err != nil {
 			return nil, err
 		}
@@ -103,7 +103,7 @@ func NewCanvasFromImage(image Image) (*Canvas, error) {
 	return nil, newError("unsupported image type")
 }
 
-func newCanvasFromWindow(window Window) (*Canvas, error) {
+func NewCanvasFromWindow(window Window) (*Canvas, error) {
 	hdc := win.GetDC(window.Handle())
 	if hdc == 0 {
 		return nil, newError("GetDC failed")
@@ -112,7 +112,7 @@ func newCanvasFromWindow(window Window) (*Canvas, error) {
 	return (&Canvas{hdc: hdc, window: window}).init()
 }
 
-func newCanvasFromHDC(hdc win.HDC) (*Canvas, error) {
+func NewCanvasFromHDC(hdc win.HDC) (*Canvas, error) {
 	if hdc == 0 {
 		return nil, newError("invalid hdc")
 	}
@@ -420,15 +420,15 @@ func (c *Canvas) DrawPolylinePixels(pen Pen, points []Point) error {
 	})
 }
 
-// rectangle draws a rectangle in 1/96" units. sizeCorrection parameter is in native pixels.
+// Rectangle draws a Rectangle in 1/96" units. sizeCorrection parameter is in native pixels.
 //
 // Deprecated: Newer applications should use rectanglePixels.
-func (c *Canvas) rectangle(brush Brush, pen Pen, bounds Rectangle, sizeCorrection int) error {
-	return c.rectanglePixels(brush, pen, RectangleFrom96DPI(bounds, c.DPI()), sizeCorrection)
+func (c *Canvas) Rectangle(brush Brush, pen Pen, bounds Rectangle, sizeCorrection int) error {
+	return c.RectanglePixels(brush, pen, RectangleFrom96DPI(bounds, c.DPI()), sizeCorrection)
 }
 
-// rectanglePixels draws a rectangle in native pixels.
-func (c *Canvas) rectanglePixels(brush Brush, pen Pen, bounds Rectangle, sizeCorrection int) error {
+// RectanglePixels draws a rectangle in native pixels.
+func (c *Canvas) RectanglePixels(brush Brush, pen Pen, bounds Rectangle, sizeCorrection int) error {
 	return c.withBrushAndPen(brush, pen, func() error {
 		if !win.Rectangle_(
 			c.hdc,
@@ -448,24 +448,24 @@ func (c *Canvas) rectanglePixels(brush Brush, pen Pen, bounds Rectangle, sizeCor
 //
 // Deprecated: Newer applications should use DrawRectanglePixels.
 func (c *Canvas) DrawRectangle(pen Pen, bounds Rectangle) error {
-	return c.rectangle(nullBrushSingleton, pen, bounds, 0)
+	return c.Rectangle(nullBrushSingleton, pen, bounds, 0)
 }
 
 // DrawRectanglePixels draws a rectangle in native pixels.
 func (c *Canvas) DrawRectanglePixels(pen Pen, bounds Rectangle) error {
-	return c.rectanglePixels(nullBrushSingleton, pen, bounds, 0)
+	return c.RectanglePixels(nullBrushSingleton, pen, bounds, 0)
 }
 
 // FillRectangle draws a filled rectangle in 1/96" units.
 //
 // Deprecated: Newer applications should use FillRectanglePixels.
 func (c *Canvas) FillRectangle(brush Brush, bounds Rectangle) error {
-	return c.rectangle(brush, nullPenSingleton, bounds, 1)
+	return c.Rectangle(brush, nullPenSingleton, bounds, 1)
 }
 
 // FillRectanglePixels draws a filled rectangle in native pixels.
 func (c *Canvas) FillRectanglePixels(brush Brush, bounds Rectangle) error {
-	return c.rectanglePixels(brush, nullPenSingleton, bounds, 1)
+	return c.RectanglePixels(brush, nullPenSingleton, bounds, 1)
 }
 
 // roundedRectangle draws a rounded rectangle in 1/96" units. sizeCorrection parameter is in native
@@ -612,8 +612,8 @@ func (c *Canvas) fontHeight(font *Font) (height int, err error) {
 	return
 }
 
-// measureTextForDPI measures text for given DPI. Input and output bounds are in native pixels.
-func (c *Canvas) measureTextForDPI(text string, font *Font, bounds Rectangle, format DrawTextFormat, dpi int) (boundsMeasured Rectangle, err error) {
+// MeasureTextForDPI measures text for given DPI. Input and output bounds are in native pixels.
+func (c *Canvas) MeasureTextForDPI(text string, font *Font, bounds Rectangle, format DrawTextFormat, dpi int) (boundsMeasured Rectangle, err error) {
 	hFont := win.HGDIOBJ(font.HandleForDPI(dpi))
 	oldHandle := win.SelectObject(c.hdc, hFont)
 	if oldHandle == 0 {

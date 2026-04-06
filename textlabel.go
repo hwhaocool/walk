@@ -100,7 +100,7 @@ func (li *textLabelLayoutItem) IdealSize() Size {
 }
 
 func (li *textLabelLayoutItem) MinSize() Size {
-	return calculateTextSize(li.text, li.font, li.ctx.dpi, li.minWidth, li.handle)
+	return CalculateTextSize(li.text, li.font, li.ctx.dpi, li.minWidth, li.handle)
 }
 
 func (li *textLabelLayoutItem) HasHeightForWidth() bool {
@@ -115,7 +115,7 @@ func (li *textLabelLayoutItem) HeightForWidth(width int) int {
 		return height
 	}
 
-	size := calculateTextSize(li.text, li.font, li.ctx.dpi, width, li.handle)
+	size := CalculateTextSize(li.text, li.font, li.ctx.dpi, width, li.handle)
 
 	li.width2Height[width] = size.Height
 
