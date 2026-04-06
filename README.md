@@ -1,5 +1,14 @@
 About Walk
-==========
+-----
+
+# 修改版
+
+## 改动点
+1. 把大部分 sytuct 的 field 改为public的，便于用的时候直接访问
+2. add-新增了一个LabelV2控件，可以展示emoji (虽然看起来不协调 ^_^)
+
+
+# 以下是原版
 
 Walk is a "Windows Application Library Kit" for the Go Programming Language.
 
