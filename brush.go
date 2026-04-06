@@ -15,49 +15,56 @@ import (
 type HatchStyle int
 
 const (
-	HatchHorizontal       HatchStyle = win.HS_HORIZONTAL
-	HatchVertical         HatchStyle = win.HS_VERTICAL
-	HatchForwardDiagonal  HatchStyle = win.HS_FDIAGONAL
+	// HatchHorizontal 水平线
+	HatchHorizontal HatchStyle = win.HS_HORIZONTAL
+	// HatchVertical 垂直线
+	HatchVertical HatchStyle = win.HS_VERTICAL
+	// HatchForwardDiagonal 正对角线（左上到右下）
+	HatchForwardDiagonal HatchStyle = win.HS_FDIAGONAL
+	// HatchBackwardDiagonal 反对角线（左下到右上）
 	HatchBackwardDiagonal HatchStyle = win.HS_BDIAGONAL
-	HatchCross            HatchStyle = win.HS_CROSS
-	HatchDiagonalCross    HatchStyle = win.HS_DIAGCROSS
+	// HatchCross 十字交叉
+	HatchCross HatchStyle = win.HS_CROSS
+	// HatchDiagonalCross 对角线交叉
+	HatchDiagonalCross HatchStyle = win.HS_DIAGCROSS
 )
 
+// SystemColor 系统颜色常量，用于获取 Windows 系统主题颜色
 type SystemColor int
 
 const (
-	SysColor3DDkShadow              SystemColor = win.COLOR_3DDKSHADOW
-	SysColor3DFace                  SystemColor = win.COLOR_3DFACE
-	SysColor3DHighlight             SystemColor = win.COLOR_3DHIGHLIGHT
-	SysColor3DLight                 SystemColor = win.COLOR_3DLIGHT
-	SysColor3DShadow                SystemColor = win.COLOR_3DSHADOW
-	SysColorActiveBorder            SystemColor = win.COLOR_ACTIVEBORDER
-	SysColorActiveCaption           SystemColor = win.COLOR_ACTIVECAPTION
-	SysColorAppWorkspace            SystemColor = win.COLOR_APPWORKSPACE
-	SysColorBackground              SystemColor = win.COLOR_BACKGROUND
-	SysColorDesktop                 SystemColor = win.COLOR_DESKTOP
-	SysColorBtnFace                 SystemColor = win.COLOR_BTNFACE
-	SysColorBtnHighlight            SystemColor = win.COLOR_BTNHIGHLIGHT
-	SysColorBtnShadow               SystemColor = win.COLOR_BTNSHADOW
-	SysColorBtnText                 SystemColor = win.COLOR_BTNTEXT
-	SysColorCaptionText             SystemColor = win.COLOR_CAPTIONTEXT
-	SysColorGrayText                SystemColor = win.COLOR_GRAYTEXT
-	SysColorHighlight               SystemColor = win.COLOR_HIGHLIGHT
-	SysColorHighlightText           SystemColor = win.COLOR_HIGHLIGHTTEXT
-	SysColorInactiveBorder          SystemColor = win.COLOR_INACTIVEBORDER
-	SysColorInactiveCaption         SystemColor = win.COLOR_INACTIVECAPTION
-	SysColorInactiveCaptionText     SystemColor = win.COLOR_INACTIVECAPTIONTEXT
-	SysColorInfoBk                  SystemColor = win.COLOR_INFOBK
-	SysColorInfoText                SystemColor = win.COLOR_INFOTEXT
-	SysColorMenu                    SystemColor = win.COLOR_MENU
-	SysColorMenuText                SystemColor = win.COLOR_MENUTEXT
-	SysColorScrollBar               SystemColor = win.COLOR_SCROLLBAR
-	SysColorWindow                  SystemColor = win.COLOR_WINDOW
-	SysColorWindowFrame             SystemColor = win.COLOR_WINDOWFRAME
-	SysColorWindowText              SystemColor = win.COLOR_WINDOWTEXT
-	SysColorHotLight                SystemColor = win.COLOR_HOTLIGHT
-	SysColorGradientActiveCaption   SystemColor = win.COLOR_GRADIENTACTIVECAPTION
-	SysColorGradientInactiveCaption SystemColor = win.COLOR_GRADIENTINACTIVECAPTION
+	SysColor3DDkShadow              SystemColor = win.COLOR_3DDKSHADOW   // 3D元素的最深阴影
+	SysColor3DFace                  SystemColor = win.COLOR_3DFACE        // 3D元素表面颜色
+	SysColor3DHighlight             SystemColor = win.COLOR_3DHIGHLIGHT   // 3D元素高光颜色
+	SysColor3DLight                 SystemColor = win.COLOR_3DLIGHT        // 3D元素浅色部分
+	SysColor3DShadow                SystemColor = win.COLOR_3DSHADOW      // 3D元素阴影颜色
+	SysColorActiveBorder            SystemColor = win.COLOR_ACTIVEBORDER  // 活动窗口边框
+	SysColorActiveCaption           SystemColor = win.COLOR_ACTIVECAPTION // 活动窗口标题栏
+	SysColorAppWorkspace            SystemColor = win.COLOR_APPWORKSPACE   // 应用程序工作区背景
+	SysColorBackground              SystemColor = win.COLOR_BACKGROUND     // 桌面背景
+	SysColorDesktop                 SystemColor = win.COLOR_DESKTOP       // 桌面颜色
+	SysColorBtnFace                 SystemColor = win.COLOR_BTNFACE       // 按钮表面颜色
+	SysColorBtnHighlight            SystemColor = win.COLOR_BTNHIGHLIGHT  // 按钮高光颜色
+	SysColorBtnShadow               SystemColor = win.COLOR_BTNSHADOW     // 按钮阴影颜色
+	SysColorBtnText                 SystemColor = win.COLOR_BTNTEXT       // 按钮文字颜色
+	SysColorCaptionText             SystemColor = win.COLOR_CAPTIONTEXT   // 标题栏文字颜色
+	SysColorGrayText                SystemColor = win.COLOR_GRAYTEXT      // 灰色文字（禁用状态）
+	SysColorHighlight               SystemColor = win.COLOR_HIGHLIGHT     // 选中项背景
+	SysColorHighlightText           SystemColor = win.COLOR_HIGHLIGHTTEXT // 选中项文字
+	SysColorInactiveBorder          SystemColor = win.COLOR_INACTIVEBORDER    // 非活动窗口边框
+	SysColorInactiveCaption         SystemColor = win.COLOR_INACTIVECAPTION   // 非活动窗口标题栏
+	SysColorInactiveCaptionText     SystemColor = win.COLOR_INACTIVECAPTIONTEXT // 非活动标题栏文字
+	SysColorInfoBk                  SystemColor = win.COLOR_INFOBK       // 信息提示框背景
+	SysColorInfoText                SystemColor = win.COLOR_INFOTEXT     // 信息提示框文字
+	SysColorMenu                    SystemColor = win.COLOR_MENU         // 菜单背景
+	SysColorMenuText                SystemColor = win.COLOR_MENUTEXT     // 菜单文字
+	SysColorScrollBar               SystemColor = win.COLOR_SCROLLBAR    // 滚动条背景
+	SysColorWindow                  SystemColor = win.COLOR_WINDOW       // 窗口背景
+	SysColorWindowFrame             SystemColor = win.COLOR_WINDOWFRAME  // 窗口框架
+	SysColorWindowText              SystemColor = win.COLOR_WINDOWTEXT   // 窗口文字
+	SysColorHotLight                SystemColor = win.COLOR_HOTLIGHT     // 热跟踪高亮颜色
+	SysColorGradientActiveCaption   SystemColor = win.COLOR_GRADIENTACTIVECAPTION   // 活动标题栏渐变
+	SysColorGradientInactiveCaption SystemColor = win.COLOR_GRADIENTINACTIVECAPTION // 非活动标题栏渐变
 )
 
 type Brush interface {
