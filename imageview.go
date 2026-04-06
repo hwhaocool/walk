@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
@@ -15,11 +16,17 @@ import (
 type ImageViewMode int
 
 const (
+	// ImageViewModeIdeal 按图像原始大小显示，组件大小随图像大小变化
 	ImageViewModeIdeal ImageViewMode = iota
+	// ImageViewModeCorner 图像放置在左上角，不缩放
 	ImageViewModeCorner
+	// ImageViewModeCenter 图像居中显示，不缩放
 	ImageViewModeCenter
+	// ImageViewModeShrink 缩小图像以适应容器，不放大
 	ImageViewModeShrink
+	// ImageViewModeZoom 缩放图像以适应容器（可缩小可放大）
 	ImageViewModeZoom
+	// ImageViewModeStretch 拉伸图像填满整个容器
 	ImageViewModeStretch
 )
 
@@ -254,28 +261,28 @@ func (iv *ImageView) CreateLayoutItem(ctx *LayoutContext) LayoutItem {
 		minSize = Size{s, s}
 	}
 
-	return &imageViewLayoutItem{
+	return &ImageViewLayoutItem{
 		layoutFlags: layoutFlags,
 		idealSize:   idealSize,
 		minSize:     minSize,
 	}
 }
 
-type imageViewLayoutItem struct {
+type ImageViewLayoutItem struct {
 	LayoutItemBase
 	layoutFlags LayoutFlags
 	idealSize   Size // in native pixels
 	minSize     Size // in native pixels
 }
 
-func (li *imageViewLayoutItem) LayoutFlags() LayoutFlags {
+func (li *ImageViewLayoutItem) LayoutFlags() LayoutFlags {
 	return li.layoutFlags
 }
 
-func (li *imageViewLayoutItem) IdealSize() Size {
+func (li *ImageViewLayoutItem) IdealSize() Size {
 	return li.idealSize
 }
 
-func (li *imageViewLayoutItem) MinSize() Size {
+func (li *ImageViewLayoutItem) MinSize() Size {
 	return li.minSize
 }
