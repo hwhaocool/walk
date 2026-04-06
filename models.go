@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
@@ -479,7 +480,7 @@ func (lis *ListItemStyle) DrawBackground() error {
 func (lis *ListItemStyle) DrawText(text string, bounds Rectangle, format DrawTextFormat) error {
 	if lis.hTheme != 0 && lis.TextColor == lis.defaultTextColor {
 		if lis.Font != nil {
-			hFontOld := win.SelectObject(lis.hdc, win.HGDIOBJ(lis.Font.handleForDPI(lis.dpi)))
+			hFontOld := win.SelectObject(lis.hdc, win.HGDIOBJ(lis.Font.HandleForDPI(lis.dpi)))
 			defer win.SelectObject(lis.hdc, hFontOld)
 		}
 		rc := bounds.toRECT()

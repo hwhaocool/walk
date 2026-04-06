@@ -268,7 +268,7 @@ func (le *LineEdit) initCharWidth() {
 	}
 	defer win.ReleaseDC(le.HWnd, hdc)
 
-	defer win.SelectObject(hdc, win.SelectObject(hdc, win.HGDIOBJ(font.handleForDPI(le.DPI()))))
+	defer win.SelectObject(hdc, win.SelectObject(hdc, win.HGDIOBJ(font.HandleForDPI(le.DPI()))))
 
 	buf := []uint16{'M'}
 

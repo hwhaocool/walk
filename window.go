@@ -1144,7 +1144,7 @@ type ApplyFonter interface {
 }
 
 func (wb *WindowBase) applyFont(font *Font) {
-	if hFont := font.handleForDPI(wb.DPI()); hFont != wb.hFont {
+	if hFont := font.HandleForDPI(wb.DPI()); hFont != wb.hFont {
 		wb.hFont = hFont
 
 		setWindowFont(wb.HWnd, hFont)
@@ -1157,7 +1157,7 @@ func (wb *WindowBase) applyFont(font *Font) {
 
 func SetWindowFont(hwnd win.HWND, font *Font) {
 	dpi := int(win.GetDpiForWindow(hwnd))
-	setWindowFont(hwnd, font.handleForDPI(dpi))
+	setWindowFont(hwnd, font.HandleForDPI(dpi))
 }
 
 func setWindowFont(hwnd win.HWND, hFont win.HFONT) {
@@ -1544,7 +1544,7 @@ func (wb *WindowBase) dialogBaseUnits() Size {
 	hdc := win.GetDC(wb.HWnd)
 	defer win.ReleaseDC(wb.HWnd, hdc)
 
-	hFont := font.handleForDPI(wb.DPI())
+	hFont := font.HandleForDPI(wb.DPI())
 	hFontOld := win.SelectObject(hdc, win.HGDIOBJ(hFont))
 	defer win.SelectObject(hdc, win.HGDIOBJ(hFontOld))
 
@@ -1651,7 +1651,7 @@ func calculateTextSize(text string, font *Font, dpi int, width int, hwnd win.HWN
 
 		size = bounds.Size()
 	} else {
-		hFontOld := win.SelectObject(hdc, win.HGDIOBJ(font.handleForDPI(dpi)))
+		hFontOld := win.SelectObject(hdc, win.HGDIOBJ(font.HandleForDPI(dpi)))
 		defer win.SelectObject(hdc, hFontOld)
 
 		lines := strings.Split(text, "\n")

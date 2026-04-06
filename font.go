@@ -2,15 +2,14 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
 
 import (
 	"syscall"
-)
 
-import (
 	"github.com/lxn/win"
 )
 
@@ -109,7 +108,7 @@ func newFontFromLOGFONT(lf *win.LOGFONT, dpi int) (*Font, error) {
 	return NewFont(family, pointSize, style)
 }
 
-func (f *Font) createForDPI(dpi int) (win.HFONT, error) {
+func (f *Font) CreateForDPI(dpi int) (win.HFONT, error) {
 	var lf win.LOGFONT
 
 	lf.LfHeight = -win.MulDiv(int32(f.pointSize), int32(dpi), 72)
@@ -178,14 +177,14 @@ func (f *Font) Italic() bool {
 
 // HandleForDPI returns the os resource handle of the font for the specified
 // DPI value.
-func (f *Font) handleForDPI(dpi int) win.HFONT {
+func (f *Font) HandleForDPI(dpi int) win.HFONT {
 	if f.dpi2hFont == nil {
 		f.dpi2hFont = make(map[int]win.HFONT)
 	} else if handle, ok := f.dpi2hFont[dpi]; ok {
 		return handle
 	}
 
-	hFont, err := f.createForDPI(dpi)
+	hFont, err := f.CreateForDPI(dpi)
 	if err != nil {
 		return 0
 	}

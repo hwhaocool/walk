@@ -386,7 +386,7 @@ func (tv *TableView) applyFont(font *Font) {
 
 	tv.WidgetBase.applyFont(font)
 
-	hFont := uintptr(font.handleForDPI(tv.DPI()))
+	hFont := uintptr(font.HandleForDPI(tv.DPI()))
 
 	win.SendMessage(tv.hwndFrozenLV, win.WM_SETFONT, hFont, 0)
 	win.SendMessage(tv.hwndNormalLV, win.WM_SETFONT, hFont, 0)
@@ -2216,7 +2216,7 @@ func (tv *TableView) lvWndProc(origWndProcPtr uintptr, hwnd win.HWND, msg uint32
 						if font == nil {
 							font = tv.Font()
 						}
-						win.SelectObject(nmlvcd.Nmcd.Hdc, win.HGDIOBJ(font.handleForDPI(dpi)))
+						win.SelectObject(nmlvcd.Nmcd.Hdc, win.HGDIOBJ(font.HandleForDPI(dpi)))
 					}
 
 					return 0
@@ -2291,7 +2291,7 @@ func (tv *TableView) lvWndProc(origWndProcPtr uintptr, hwnd win.HWND, msg uint32
 
 				case win.CDDS_ITEMPREPAINT | win.CDDS_SUBITEM:
 					if tv.itemFont != nil {
-						win.SelectObject(nmlvcd.Nmcd.Hdc, win.HGDIOBJ(tv.itemFont.handleForDPI(tv.DPI())))
+						win.SelectObject(nmlvcd.Nmcd.Hdc, win.HGDIOBJ(tv.itemFont.HandleForDPI(tv.DPI())))
 					}
 
 					if applyCellStyle() == win.CDRF_SKIPDEFAULT && win.IsAppThemed() {

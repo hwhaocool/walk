@@ -532,7 +532,7 @@ func (cb *ComboBox) calculateMaxItemTextWidth() int {
 	}
 	defer win.ReleaseDC(cb.HWnd, hdc)
 
-	hFontOld := win.SelectObject(hdc, win.HGDIOBJ(cb.Font().handleForDPI(cb.DPI())))
+	hFontOld := win.SelectObject(hdc, win.HGDIOBJ(cb.Font().HandleForDPI(cb.DPI())))
 	defer win.SelectObject(hdc, hFontOld)
 
 	var maxWidth int

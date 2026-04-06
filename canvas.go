@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
@@ -189,7 +190,7 @@ func (c *Canvas) withBrush(brush Brush, f func() error) error {
 }
 
 func (c *Canvas) withFontAndTextColor(font *Font, color Color, f func() error) error {
-	return c.withGdiObj(win.HGDIOBJ(font.handleForDPI(c.DPI())), func() error {
+	return c.withGdiObj(win.HGDIOBJ(font.HandleForDPI(c.DPI())), func() error {
 		oldColor := win.SetTextColor(c.hdc, win.COLORREF(color))
 		if oldColor == win.CLR_INVALID {
 			return newError("SetTextColor failed")
@@ -613,7 +614,7 @@ func (c *Canvas) fontHeight(font *Font) (height int, err error) {
 
 // measureTextForDPI measures text for given DPI. Input and output bounds are in native pixels.
 func (c *Canvas) measureTextForDPI(text string, font *Font, bounds Rectangle, format DrawTextFormat, dpi int) (boundsMeasured Rectangle, err error) {
-	hFont := win.HGDIOBJ(font.handleForDPI(dpi))
+	hFont := win.HGDIOBJ(font.HandleForDPI(dpi))
 	oldHandle := win.SelectObject(c.hdc, hFont)
 	if oldHandle == 0 {
 		err = newError("SelectObject failed")
@@ -706,7 +707,7 @@ func (c *Canvas) measureAndModifyTextPixels(text string, font *Font, bounds Rect
 		}
 	}
 
-	hFont := win.HGDIOBJ(font.handleForDPI(c.DPI()))
+	hFont := win.HGDIOBJ(font.HandleForDPI(c.DPI()))
 	oldHandle := win.SelectObject(c.measureTextMetafile.hdc, hFont)
 	if oldHandle == 0 {
 		err = newError("SelectObject failed")
