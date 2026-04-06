@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build windows
 // +build windows
 
 package walk
@@ -9,9 +10,7 @@ package walk
 import (
 	"syscall"
 	"unsafe"
-)
 
-import (
 	"github.com/lxn/win"
 )
 
@@ -34,7 +33,7 @@ func NewStatusBar(parent Container) (*StatusBar, error) {
 		return nil, err
 	}
 
-	sb.items = newStatusBarItemList(sb)
+	sb.items = NewStatusBarItemList(sb)
 
 	return sb, nil
 }
@@ -140,7 +139,7 @@ func (*statusBarLayoutItem) IdealSize() Size {
 // StatusBarItem represents a section of a StatusBar that can have its own icon,
 // text, tool tip text and width.
 type StatusBarItem struct {
-	sb               *StatusBar
+	Sb               *StatusBar
 	icon             *Icon
 	text             string
 	toolTipText      string
@@ -218,7 +217,7 @@ func (sbi *StatusBarItem) SetWidth(width int) error {
 	old := sbi.width
 	sbi.width = width
 
-	if sbi.sb != nil {
+	if sbi.Sb != nil {
 		succeeded := false
 		defer func() {
 			if !succeeded {
@@ -226,7 +225,7 @@ func (sbi *StatusBarItem) SetWidth(width int) error {
 			}
 		}()
 
-		if err := sbi.sb.updateParts(); err != nil {
+		if err := sbi.Sb.updateParts(); err != nil {
 			return err
 		}
 
@@ -245,7 +244,7 @@ func (sbi *StatusBarItem) raiseClicked() {
 }
 
 func (sbi *StatusBarItem) maybeTry(f func(index int) error, rollback func()) error {
-	if sbi.sb != nil {
+	if sbi.Sb != nil {
 		succeeded := false
 		defer func() {
 			if !succeeded {
@@ -253,7 +252,7 @@ func (sbi *StatusBarItem) maybeTry(f func(index int) error, rollback func()) err
 			}
 		}()
 
-		if err := f(sbi.sb.items.Index(sbi)); err != nil {
+		if err := f(sbi.Sb.items.Index(sbi)); err != nil {
 			return err
 		}
 
@@ -280,10 +279,10 @@ func (sbi *StatusBarItem) update(index int) error {
 func (sbi *StatusBarItem) updateIcon(index int) error {
 	var hIcon win.HICON
 	if sbi.icon != nil {
-		hIcon = sbi.icon.handleForDPI(sbi.sb.DPI())
+		hIcon = sbi.icon.handleForDPI(sbi.Sb.DPI())
 	}
 
-	if 0 == sbi.sb.SendMessage(
+	if 0 == sbi.Sb.SendMessage(
 		win.SB_SETICON,
 		uintptr(index),
 		uintptr(hIcon)) {
@@ -300,7 +299,7 @@ func (sbi *StatusBarItem) updateText(index int) error {
 		return err
 	}
 
-	if 0 == sbi.sb.SendMessage(
+	if 0 == sbi.Sb.SendMessage(
 		win.SB_SETTEXT,
 		uintptr(win.MAKEWORD(byte(index), 0)),
 		uintptr(unsafe.Pointer(utf16))) {
@@ -317,7 +316,7 @@ func (sbi *StatusBarItem) updateToolTipText(index int) error {
 		return err
 	}
 
-	sbi.sb.SendMessage(
+	sbi.Sb.SendMessage(
 		win.SB_SETTIPTEXT,
 		uintptr(index),
 		uintptr(unsafe.Pointer(utf16)))
@@ -330,7 +329,7 @@ type StatusBarItemList struct {
 	items []*StatusBarItem
 }
 
-func newStatusBarItemList(statusBar *StatusBar) *StatusBarItemList {
+func NewStatusBarItemList(statusBar *StatusBar) *StatusBarItemList {
 	return &StatusBarItemList{sb: statusBar}
 }
 
@@ -379,7 +378,7 @@ func (l *StatusBarItemList) Contains(item *StatusBarItem) bool {
 }
 
 func (l *StatusBarItemList) Insert(index int, item *StatusBarItem) error {
-	if item.sb != nil {
+	if item.Sb != nil {
 		return newError("item already contained in a StatusBar")
 	}
 
@@ -387,12 +386,12 @@ func (l *StatusBarItemList) Insert(index int, item *StatusBarItem) error {
 	copy(l.items[index+1:], l.items[index:])
 	l.items[index] = item
 
-	item.sb = l.sb
+	item.Sb = l.sb
 
 	succeeded := false
 	defer func() {
 		if !succeeded {
-			item.sb = nil
+			item.Sb = nil
 			l.items = append(l.items[:index], l.items[index+1:]...)
 
 			l.sb.update()
@@ -423,7 +422,7 @@ func (l *StatusBarItemList) Remove(item *StatusBarItem) error {
 
 func (l *StatusBarItemList) RemoveAt(index int) error {
 	item := l.items[index]
-	item.sb = nil
+	item.Sb = nil
 
 	l.items = append(l.items[:index], l.items[index+1:]...)
 
@@ -434,7 +433,7 @@ func (l *StatusBarItemList) RemoveAt(index int) error {
 			copy(l.items[index+1:], l.items[index:])
 			l.items[index] = item
 
-			item.sb = l.sb
+			item.Sb = l.sb
 
 			l.sb.update()
 		}
